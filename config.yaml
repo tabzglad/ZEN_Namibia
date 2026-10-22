@@ -1,0 +1,6 @@
+analysis:
+  dataset: zen_namibia_dataset
+  objective: total_cost
+  sense: min
+solver:
+  name: gurobi
