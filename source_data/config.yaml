@@ -1,0 +1,44 @@
+# global settings
+name: zen-namibia
+source_path: "./source_data"
+output_folder: null
+
+# all settings in the system.json file with the exception of technology lists
+system:
+  set_nodes:
+    - NAM
+  reference_year: 2024
+  unaggregated_time_steps_per_year: 1
+  aggregated_time_steps_per_year: 1
+  conduct_time_series_aggregation: false
+  optimized_years: 1
+  interval_between_years: 1
+  use_rolling_horizon: false
+  years_in_rolling_horizon: 1
+
+# add technologies/carriers to the model (resolved to the custom classes in zen_namibia/elements/)
+elements:
+  insert:
+    energy_system: energy_system_namibia
+    set_carriers:
+      - electricity
+      - natural_gas
+    set_conversion_technologies:
+      - photovoltaics
+      - natural_gas_turbine
+
+# settings that go into the energy_system folder
+energy_system:
+  units:
+    base_units:
+      - hour
+      - MW
+      - km
+      - kilotons
+      - Euro
+    definitions:
+      Euro:
+        dimension: currency
+        aliases:
+          - EURO
+          - Eur
