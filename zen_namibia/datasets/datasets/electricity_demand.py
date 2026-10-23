@@ -55,5 +55,6 @@ class ElectricityDemand(Dataset[pd.DataFrame]):
                 description="Mock demand values, to be replaced with real data.",
                 metadata=self.metadata,
             ),
+            
         )
         return attr

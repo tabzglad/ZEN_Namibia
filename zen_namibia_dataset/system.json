@@ -1,0 +1,21 @@
+{
+    "set_nodes": [
+        "NAM"
+    ],
+    "unaggregated_time_steps_per_year": 1,
+    "conduct_time_series_aggregation": false,
+    "aggregated_time_steps_per_year": 1,
+    "reference_year": 2024,
+    "optimized_years": 1,
+    "interval_between_years": 1,
+    "use_rolling_horizon": false,
+    "years_in_rolling_horizon": 1,
+    "set_conversion_technologies": [
+        "photovoltaics",
+        "onshore_wind_turbine",
+        "hydro_turbine",
+        "diesel_generator",
+        "coal_steam_turbine",
+        "natural_gas_turbine"
+    ]
+}
