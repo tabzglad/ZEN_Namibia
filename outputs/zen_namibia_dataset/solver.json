@@ -1,0 +1,28 @@
+{
+  "name": "gurobi",
+  "solver_options": {},
+  "check_unit_consistency": true,
+  "solver_dir": "outputs\\solver_files",
+  "keep_files": false,
+  "io_api": "lp",
+  "save_duals": false,
+  "save_reduced_costs": false,
+  "save_parameters": true,
+  "selected_saved_parameters": [],
+  "selected_saved_variables": [],
+  "selected_saved_duals": [],
+  "selected_saved_reduced_costs": [],
+  "round_parameters": false,
+  "rounding_decimal_points_units": 6,
+  "rounding_decimal_points_capacity": 4,
+  "rounding_decimal_points_tsa": 4,
+  "analyze_numerics": true,
+  "run_diagnostics": false,
+  "use_scaling": true,
+  "scaling_include_rhs": true,
+  "scaling_algorithm": [
+    "geom",
+    "geom",
+    "geom"
+  ]
+}

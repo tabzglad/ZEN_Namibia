@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from zen_creator import Model
+from zen_creator import Config, Model
 
 # importing these registers the custom classes in zen_namibia/elements/ with
 # zen_creator, so that Model.from_config() can find them by name
@@ -13,7 +13,13 @@ CONFIG_PATH = Path(__file__).resolve().parent / "source_data" / "config.yaml"
 
 
 def create_model() -> Model:
-    model = Model.from_config(CONFIG_PATH)
+    config = Config.load_from_yaml(CONFIG_PATH)
+    if config.source_path is not None:
+        source_path = Path(config.source_path)
+        if not source_path.is_absolute():
+            config.source_path = str(CONFIG_PATH.parent.parent / source_path)
+
+    model = Model.from_config(config)
 
     # the built ZEN-garden dataset is written to INPUT_DATA_PATH
     model.name = INPUT_DATA_PATH.name
