@@ -6,10 +6,7 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-
-# MOCK DATA: 1 MW of photovoltaic capacity is already installed (preinstalled PV).
-# TODO: replace with the real existing capacity once available.
-CAPACITY_EXISTING = 1.0
+from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -63,7 +60,7 @@ class Photovoltaics(ConversionTechnology):
         """Set the preinstalled (already existing) photovoltaic capacity."""
         return Attribute(
             "capacity_existing",
-            default_value=CAPACITY_EXISTING,
+            default_value=NamibiaBaseline(self.source_path).capacity_existing("omburu_pv_mw"),
             unit=self.power_unit,
             element=self,
         )

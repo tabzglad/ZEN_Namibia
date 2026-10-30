@@ -6,10 +6,7 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-
-# MOCK DATA: 1 MW of coal capacity is already installed (preinstalled PV).
-# TODO: replace with the real existing capacity once available.
-CAPACITY_EXISTING = 1.0
+from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -33,11 +30,8 @@ class CoalSteamTurbine(ConversionTechnology):
         )
 
     def _set_input_carrier(self) -> Attribute:
-        """
-        Coal steam turbine has no input carrier, since it converts coal energy
-        directly into electricity.
-        """
-        return Attribute(name="input_carrier", default_value=[], element=self)
+        """Use coal as the plant's fuel input carrier."""
+        return Attribute(name="input_carrier", default_value=["coal"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """Set the output carrier of coal steam turbine to electricity."""
@@ -53,9 +47,12 @@ class CoalSteamTurbine(ConversionTechnology):
         )
 
     def _set_conversion_factor(self) -> Attribute:
-        """Coal steam turbine has no input carrier, so no conversion factor is needed."""
-        attr = self.conversion_factor  # default value: []
-        return attr
+        """Placeholder fuel-to-electricity ratio; replace when plant efficiency is sourced."""
+        return Attribute(
+            name="conversion_factor",
+            default_value=[{"coal": {"default_value": 1.0, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
+            element=self,
+        )
 
     # ---------- Optional method for overriding a default attribute ----------
 
@@ -63,7 +60,7 @@ class CoalSteamTurbine(ConversionTechnology):
         """Set the preinstalled (already existing) coal steam turbine  capacity."""
         return Attribute(
             "capacity_existing",
-            default_value=CAPACITY_EXISTING,
+            default_value=NamibiaBaseline(self.source_path).capacity_existing("van_eck_thermal_mw"),
             unit=self.power_unit,
             element=self,
         )

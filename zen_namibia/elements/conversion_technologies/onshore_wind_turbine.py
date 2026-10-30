@@ -7,10 +7,6 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-# MOCK DATA: 1 MW of onshore wind turbine capacity is already installed (preinstalled PV).
-# TODO: replace with the real existing capacity once available.
-CAPACITY_EXISTING = 1.0
-
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
 LIFETIME = 25
@@ -62,7 +58,7 @@ class onshorewind(ConversionTechnology):
         """Set the preinstalled (already existing) onshore_wind_turbine capacity."""
         return Attribute(
             "capacity_existing",
-            default_value=CAPACITY_EXISTING,
+            default_value=0.0,
             unit=self.power_unit,
             element=self,
         )

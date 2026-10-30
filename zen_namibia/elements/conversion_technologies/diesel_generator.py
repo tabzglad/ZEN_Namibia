@@ -6,10 +6,7 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-
-# MOCK DATA: 1 MW of diesel generator capacity is already installed (preinstalled PV).
-# TODO: replace with the real existing capacity once available.
-CAPACITY_EXISTING = 1.0
+from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -33,11 +30,8 @@ class DieselGenerator(ConversionTechnology):
         )
 
     def _set_input_carrier(self) -> Attribute:
-        """
-        DieselGenerator has no input carrier, since it converts diesel fuel
-        directly into electricity.
-        """
-        return Attribute(name="input_carrier", default_value=[], element=self)
+        """Use diesel as the plant's fuel input carrier."""
+        return Attribute(name="input_carrier", default_value=["diesel"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
         """Set the output carrier of diesel generator to electricity."""
@@ -53,9 +47,12 @@ class DieselGenerator(ConversionTechnology):
         )
 
     def _set_conversion_factor(self) -> Attribute:
-        """DieselGenerator has no input carrier, so no conversion factor is needed."""
-        attr = self.conversion_factor  # default value: []
-        return attr
+        """Placeholder fuel-to-electricity ratio; replace when plant efficiency is sourced."""
+        return Attribute(
+            name="conversion_factor",
+            default_value=[{"diesel": {"default_value": 1.0, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
+            element=self,
+        )
 
     # ---------- Optional method for overriding a default attribute ----------
 
@@ -63,7 +60,7 @@ class DieselGenerator(ConversionTechnology):
         """Set the preinstalled (already existing) diesel generator capacity."""
         return Attribute(
             "capacity_existing",
-            default_value=CAPACITY_EXISTING,
+            default_value=NamibiaBaseline(self.source_path).capacity_existing("anixas_diesel_mw"),
             unit=self.power_unit,
             element=self,
         )

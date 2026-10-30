@@ -8,10 +8,7 @@ if TYPE_CHECKING:
 from zen_creator import Attribute, Carrier
 
 from zen_namibia.datasets.datasets.electricity_demand import ElectricityDemand
-
-# MOCK DATA: up to 1 MW can be imported at every hour of the year.
-# TODO: replace with the real grid import limit once available.
-AVAILABILITY_IMPORT = 1.0
+from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
 
 
 class Electricity(Carrier):
@@ -23,14 +20,37 @@ class Electricity(Carrier):
         super().__init__(model=model, power_unit=power_unit)
 
     def _set_demand(self) -> Attribute:
-        """Set the electricity demand, loaded from source_data/demand_electricity.csv."""
+        """Set the electricity demand, loaded from source_data/demands.csv."""
         return ElectricityDemand(self.source_path).get_demand(self)
 
     def _set_availability_import(self) -> Attribute:
-        """Set the maximum electricity import (same value for every time step)."""
+        """Allow imports up to each year's observed annual import volume."""
         return Attribute(
-            "availability_import",
-            default_value=AVAILABILITY_IMPORT,
-            unit=self.power_unit,
+            "availability_import", default_value=1.0e6, unit=self.power_unit,
             element=self,
+        )
+
+    def _set_availability_export(self) -> Attribute:
+        """Allow exports up to each year's observed annual export volume."""
+        return Attribute(
+            "availability_export", default_value=1.0e6, unit=self.power_unit,
+            element=self,
+        )
+
+    def _set_availability_import_yearly(self) -> Attribute:
+        """Annual import cap from observed GWh, stored as MWh."""
+        baseline = NamibiaBaseline(self.source_path).data.set_index("year")
+        limits = baseline[["imports_gwh"]].rename(columns={"imports_gwh": "NAM"}) * 1000
+        return Attribute(
+            "availability_import_yearly", default_value=0.0,
+            unit=f"{self.power_unit}*h", element=self, df=limits,
+        )
+
+    def _set_availability_export_yearly(self) -> Attribute:
+        """Annual export cap from observed GWh, stored as MWh."""
+        baseline = NamibiaBaseline(self.source_path).data.set_index("year")
+        limits = baseline[["exports_gwh"]].rename(columns={"exports_gwh": "NAM"}) * 1000
+        return Attribute(
+            "availability_export_yearly", default_value=0.0,
+            unit=f"{self.power_unit}*h", element=self, df=limits,
         )
