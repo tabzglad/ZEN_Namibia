@@ -2,15 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-import pandas as pd
-
 if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-from zen_namibia.datasets.datasets.dispatch_assumptions import load_dispatch_assumptions
-from zen_namibia.datasets.datasets.namibia_baseline import load_baseline
+
+from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
+from zen_namibia.utils import capacity_existing_df
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -69,29 +67,14 @@ class DieselGenerator(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         """Set the preinstalled (already existing) diesel generator capacity."""
+        reference_year = self.config.system.reference_year
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "anixas_diesel_mw", reference_year
+        )
         return Attribute(
             "capacity_existing",
-            default_value=load_baseline(self.source_path).capacity_existing("anixas_diesel_mw"),
+            default_value=capacity,
             unit=self.power_unit,
             element=self,
-        )
-
-    def _set_min_full_load_hours_fraction(self) -> Attribute:
-        return load_dispatch_assumptions(self.source_path).minimum_dispatch_attribute(self)
-
-    def _set_max_load(self) -> Attribute:
-        """Make diesel available at full output only in the assumed peak hours."""
-        demand = pd.read_csv(self.source_path / "hourly_demand_2023.csv")
-        if len(demand) != 8760:
-            raise ValueError("2023 demand must have 8760 rows for diesel peak dispatch")
-        peak_hours = load_dispatch_assumptions(self.source_path).peak_hours(self.name)
-        peak_indices = demand["demand_mw"].nlargest(peak_hours).index
-        profile_values = np.zeros(8760, dtype=float)
-        profile_values[peak_indices] = 1.0
-        profile = pd.DataFrame(
-            {"NAM": profile_values},
-            index=pd.RangeIndex(8760, name="time"),
-        )
-        return Attribute(
-            "max_load", default_value=1.0, unit="1", element=self, df=profile
+            df=capacity_existing_df(capacity, reference_year),
         )

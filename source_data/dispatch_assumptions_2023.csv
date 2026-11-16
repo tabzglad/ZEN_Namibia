@@ -1,4 +1,0 @@
-technology,assumption_type,assumption_value,description
-coal_steam_turbine,capacity_fraction,0.60,"Assumed annual minimum generation equal to 60% of installed capacity-hours; hourly output may vary up to full capacity."
-diesel_generator,peak_hours_fraction,0.05,"Assume peaking dispatch at full capacity during the 438 highest-demand hours (5% of the year)."
-hydro_turbine,capacity_fraction,0.00,"Flexible balancing generation; no minimum, and existing capacity is capped at 347 MW with a weather-based availability profile."

@@ -9,8 +9,10 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-from zen_namibia.datasets.datasets.dispatch_assumptions import load_dispatch_assumptions
-from zen_namibia.datasets.datasets.namibia_baseline import load_baseline
+
+from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
+from zen_namibia.datasets.datasets.technology.renewables_ninja import RenewablesNinja
+from zen_namibia.utils import capacity_existing_df
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -64,16 +66,23 @@ class HydroTurbine(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         """Set the preinstalled (already existing) hydro turbine capacity."""
+        reference_year = self.config.system.reference_year
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", reference_year
+        )
         return Attribute(
             "capacity_existing",
-            default_value=load_baseline(self.source_path).capacity_existing("ruacana_hydro_mw"),
+            default_value=capacity,
             unit=self.power_unit,
             element=self,
+            df=capacity_existing_df(capacity, reference_year),
         )
 
     def _set_capacity_limit(self) -> Attribute:
         """Prevent the 2023 snapshot from expanding the existing hydro fleet."""
-        capacity = load_baseline(self.source_path).capacity_existing("ruacana_hydro_mw")
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", self.config.system.reference_year
+        )
         return Attribute(
             "capacity_limit", default_value=capacity,
             unit=self.power_unit, element=self,
@@ -87,24 +96,8 @@ class HydroTurbine(ConversionTechnology):
         generation benchmark; that benchmark is NamPower FY2023, not calendar
         2023, and is therefore an explicit modeling assumption.
         """
-        weather_path = (
-            self.source_path / "renewable_ninja_profiles_2023" / "hydro_weather_2023.csv"
-        )
-        weather = pd.read_csv(weather_path, comment="#", parse_dates=["time"])
-        required = {"time", "prectotland"}
-        missing = required.difference(weather.columns)
-        if missing:
-            raise ValueError(
-                f"hydro_weather_2023.csv is missing columns: {', '.join(sorted(missing))}"
-            )
-        if len(weather) != HOURS_PER_YEAR or weather["time"].isna().any():
-            raise ValueError("Hydro weather must contain 8,760 valid 2023 hourly rows")
-        if weather["time"].dt.year.nunique() != 1 or int(weather["time"].dt.year.iloc[0]) != 2023:
-            raise ValueError("hydro_weather_2023.csv must contain calendar-year 2023")
-
-        rainfall = pd.to_numeric(weather["prectotland"], errors="raise")
-        if rainfall.isna().any() or (rainfall < 0).any():
-            raise ValueError("Hydro weather precipitation must be complete and non-negative")
+        weather = RenewablesNinja(self.source_path).hydro_precipitation()
+        rainfall = weather["prectotland"]
 
         monthly_rainfall = rainfall.groupby(weather["time"].dt.month).sum().reindex(
             range(1, 13), fill_value=0.0
@@ -121,7 +114,9 @@ class HydroTurbine(ConversionTechnology):
 
         month_hours = weather["time"].dt.month.value_counts().reindex(range(1, 13), fill_value=0).sort_index()
         target_gwh = RUACANA_ANNUAL_ENERGY_PROXY_GWH
-        capacity_mw = load_baseline(self.source_path).capacity_existing("ruacana_hydro_mw")
+        capacity_mw = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", self.config.system.reference_year
+        )
 
         def annual_energy(scale: float) -> float:
             fractions = np.minimum(1.0, runoff_index.to_numpy() * scale)
@@ -150,7 +145,4 @@ class HydroTurbine(ConversionTechnology):
         return Attribute(
             "max_load", default_value=1.0, unit="1", element=self, df=profile
         )
-
-    def _set_min_full_load_hours_fraction(self) -> Attribute:
-        return load_dispatch_assumptions(self.source_path).minimum_dispatch_attribute(self)
 

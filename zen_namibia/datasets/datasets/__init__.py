@@ -1,15 +1,13 @@
-from .dispatch_assumptions import DispatchAssumptions, load_dispatch_assumptions
-from .electricity_demand import ElectricityDemand
-from .namibia_baseline import NamibiaBaseline, load_baseline, read_reference_year
-from .renewable_plants import RenewablePlants, load_renewable_plants
+from .carrier.nampower import NamPowerDemand
+from .carrier.pypsa import PyPSA
+from .technology.manual_renewable_plants import ManualRenewablePlants
+from .technology.nampower import NamPowerCapacities
+from .technology.renewables_ninja import RenewablesNinja
 
 __all__ = [
-    "DispatchAssumptions",
-    "ElectricityDemand",
-    "NamibiaBaseline",
-    "RenewablePlants",
-    "load_baseline",
-    "load_dispatch_assumptions",
-    "load_renewable_plants",
-    "read_reference_year",
+    "ManualRenewablePlants",
+    "NamPowerCapacities",
+    "NamPowerDemand",
+    "PyPSA",
+    "RenewablesNinja",
 ]

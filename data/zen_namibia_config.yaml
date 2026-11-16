@@ -1,9 +1,7 @@
 # global settings
-name: zen-namibia
-source_path: "./source_data"
-output_folder: null
+source_path: "./data/raw_data"
 
-# all settings in the system.json file with the exception of technology lists
+# all settings in the system.yaml file with the exception of technology lists
 system:
   set_nodes:
     - NAM

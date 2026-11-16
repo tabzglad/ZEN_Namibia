@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-from zen_namibia.datasets.datasets.renewable_plants import load_renewable_plants
+
+from zen_namibia.datasets.dataset_collections.renewable_fleet import RenewableFleet
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -56,10 +57,10 @@ class OnshoreWindTurbine(ConversionTechnology):
     # ---------- Optional methods for applying Renewable Ninja data ----------
 
     def _set_capacity_limit(self) -> Attribute:
-        return load_renewable_plants(self.source_path).get_capacity_limit(self, "wind")
+        return RenewableFleet(self.source_path).get_capacity_limit(self, "wind")
 
     def _set_max_load(self) -> Attribute:
-        return load_renewable_plants(self.source_path).get_max_load(self, "wind")
+        return RenewableFleet(self.source_path).get_max_load(self, "wind")
 
     def _set_capacity_existing(self) -> Attribute:
-        return load_renewable_plants(self.source_path).get_capacity_existing(self, "wind")
+        return RenewableFleet(self.source_path).get_capacity_existing(self, "wind")

@@ -24,26 +24,31 @@ The dataset and output folder names are set in `global_vars.py` and
 
 ## Where to find what
 
-- `source_data/config.yaml` — zen-creator config: reference year, time steps,
-  and which carriers/technologies are inserted
-- `source_data/*.csv` — raw inputs (capacities, demand, hourly demand, imports,
-  renewable plants, dispatch assumptions); see `source_data/readme.md` for
-  sources and assumptions
+- `data/zen_namibia_config.yaml` — zen-creator config: reference year, time
+  steps, and which carriers/technologies are inserted
+- `data/raw_data/` — raw inputs, one folder per source
+  (`<category>/<source>/`, as in ZEN-europe); see `data/raw_data/README.md`
+  for files, sources and assumptions
 - `zen_namibia/elements/` — carrier, technology and energy-system definitions
   (edit these to change assumptions)
-- `zen_namibia/datasets/datasets/` — loaders that turn `source_data/` CSVs into
-  attributes. Use the cached helpers (`load_baseline`, `load_renewable_plants`,
-  `load_dispatch_assumptions`, `read_reference_year`) so each CSV is read once
-  per build
-- `create_model.py` — builds and writes the dataset, then adds existing-capacity
-  vintages and year-specific `demand_<year>.csv` files
+- `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand),
+  `carrier/pypsa.py` (hourly demand shape), `technology/renewables_ninja.py`
+  (wind/solar profiles, hydro weather), `technology/nampower.py` (NamPower
+  capacities) and `technology/manual_renewable_plants.py` (own list of
+  wind/solar plants).
+- `zen_namibia/datasets/dataset_collections/` — combine several sources:
+  `electricity_demand.py` (PyPSA shape scaled to NamPower totals) and
+  `renewable_fleet.py` (plant list + Renewables.ninja profiles + NamPower's
+  Omburu PV)
+- `create_model.py` — builds and writes the dataset (existing-capacity
+  vintages are set in the technology classes)
 - `run_zen_garden.py` — solves the built dataset
 - `global_vars.py` — shared paths used by both scripts
 
 ## Notes
 
 - All year-dependent inputs follow `system.reference_year` in
-  `source_data/config.yaml`. The hourly demand profile in
+  `data/zen_namibia_config.yaml`. The hourly demand profile in
   `hourly_demand_2023.csv` is only available for 2023; other years use a flat
   annual-average profile.
 - Natural gas is not included until sourced 2023 capacity and fuel data are available.

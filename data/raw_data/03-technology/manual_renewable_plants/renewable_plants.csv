@@ -1,0 +1,13 @@
+plant,technology,capacity_mw,capacity_factor_2023_percent,profile_file
+Miles 7 Wind Turbine,wind,0.2200,7.96,wind_miles_7.csv
+Ombepo,wind,5.0000,52.81,wind_ombepo.csv
+Ejuva,solar,10.0000,17.30,pv_ejuva.csv
+Gaib Solar,solar,100.0000,28.94,pv_gaib.csv
+HopSol Hardap,solar,47.0000,29.55,pv_hopsol_hardap.csv
+HopSol Otjiwarongo,solar,5.0000,17.72,pv_hopsol_otjiwarongo.csv
+HopSol Otjozondjupa,solar,5.0000,17.69,pv_hopsol_otjozondjupa.csv
+InnoSun Omburu,solar,4.5000,28.00,pv_innosun_omburu.csv
+Karibib Solar,solar,5.0000,17.57,pv_karibib.csv
+Otjikoto Solar Power Station (Maxwell Farm),solar,10.0000,28.33,pv_otjikoto.csv
+Rosh Pinah Solar,solar,5.4000,28.20,pv_rosh_pinah.csv
+TeraSun Energy Solar Power Station (Arandis),solar,81.0000,29.28,pv_terasun_arandis.csv
