@@ -5,27 +5,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from zen_creator import Model
 
-import numpy as np
-import pandas as pd
 from zen_creator import Attribute, TransportTechnology
 
+from zen_namibia.datasets.dataset_collections.interconnectors import Interconnectors
+from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
+    ZENNamibiaAssumptions,
+)
 from zen_namibia.datasets.datasets.technology.sapp import SAPPTransferLimits
-from zen_namibia.elements.energy_systems.energy_system_namibia import NODES
-
-# MOCK DATA: assumed lifetime of 40 years; irrelevant without investment.
-# TODO: replace with a real lifetime assumption once available.
-LIFETIME = 40
-EARTH_RADIUS_KM = 6371.0
-TIE_BREAK_EURO_PER_MWH = 0.01
-
-
-def great_circle_km(node_from: str, node_to: str) -> float:
-    """Straight-line distance between two node coordinates."""
-    lon1, lat1, lon2, lat2 = np.radians(
-        [NODES.lon[node_from], NODES.lat[node_from], NODES.lon[node_to], NODES.lat[node_to]]
-    )
-    a = np.sin((lat2 - lat1) / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2
-    return float(2 * EARTH_RADIUS_KM * np.arcsin(np.sqrt(a)))
 
 
 class PowerLine(TransportTechnology):
@@ -39,61 +25,26 @@ class PowerLine(TransportTechnology):
     # ---------- Required methods that are called during object construction ----------
 
     def _set_reference_carrier(self) -> Attribute:
-        return Attribute(
-            name="reference_carrier", default_value=["electricity"], element=self
-        )
+        return Attribute(name="reference_carrier", default_value=["electricity"], element=self)
 
     # ---------- Required methods that are called during object build ----------
 
     def _set_lifetime(self) -> Attribute:
-        return Attribute("lifetime", default_value=LIFETIME, unit="1", element=self)
+        return ZENNamibiaAssumptions(self.source_path).get_lifetime(self, "power_line_lifetime")
 
     # ---------- Optional methods for overriding default attributes ----------
 
     def _set_capacity_existing(self) -> Attribute:
-        """Existing transfer capacity per directed edge from interconnectors.csv."""
-        reference_year = self.config.system.reference_year
-        capacities = SAPPTransferLimits(self.source_path).edge_capacities()
-        df = pd.DataFrame(
-            {"capacity_existing": capacities.to_numpy()},
-            index=pd.MultiIndex.from_tuples(
-                [(edge, reference_year) for edge in capacities.index],
-                names=["edge", "year_construction"],
-            ),
-        )
-        return Attribute(
-            "capacity_existing", default_value=0.0, unit=self.power_unit,
-            element=self, df=df,
-        )
+        return SAPPTransferLimits(self.source_path).get_capacity_existing(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        """No new line capacity: each edge is capped at its existing limit."""
-        capacities = SAPPTransferLimits(self.source_path).edge_capacities()
-        df = pd.DataFrame({"capacity_limit": capacities.to_numpy()}, index=capacities.index)
-        return Attribute(
-            "capacity_limit", default_value=0.0, unit=self.power_unit, element=self, df=df,
-        )
+        return SAPPTransferLimits(self.source_path).get_capacity_limit(self)
 
     def _set_opex_specific_variable(self) -> Attribute:
-        """Tiny wheeling cost so the solver does not route power in loops.
-
-        Without it, flows in both directions at once or wheeling through
-        Namibia cost nothing, and the reported line flows are arbitrary.
-        The value is a numerical tie-breaker, not a sourced tariff.
-        """
-        return Attribute(
-            "opex_specific_variable", default_value=TIE_BREAK_EURO_PER_MWH,
-            unit=f"Euro/({self.power_unit}*h)", element=self,
-        )
+        """Tiny wheeling cost so the solver does not route power in loops."""
+        return ZENNamibiaAssumptions(self.source_path).get_attribute(
+            self, "opex_specific_variable", "power_line_wheeling_cost",
+            unit=f"Euro/({self.power_unit}*h)")
 
     def _set_distance(self) -> Attribute:
-        """Straight-line distance between the node coordinates.
-
-        Only informative: transport losses and line costs are zero.
-        """
-        edges = SAPPTransferLimits(self.source_path).edge_capacities().index
-        df = pd.DataFrame(
-            {"distance": [great_circle_km(*edge.split("-")) for edge in edges]},
-            index=edges,
-        )
-        return Attribute("distance", default_value=0.0, unit="km", element=self, df=df)
+        return Interconnectors(self.source_path).get_distance(self)

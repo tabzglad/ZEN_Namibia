@@ -5,8 +5,9 @@ demand
 ------
 
 Step 1
-Hyphen Phase 1 green hydrogen output (175,000 t/yr at 33.33 MWh/t), flat over the year at the Namibian node, from the first production year.
+Hyphen Phase 1 green hydrogen output (175,000 t/yr) times the lower heating value, flat over the year at the Namibian node, from 2028.
 
-**Citation**
+**Citations**
 
-ZEN Namibia (2026). Green hydrogen demand and technology assumptions. Hyphen project updates (Engineering News 2026, Windhoek Express 2025), IEA, US DOE.. Note: Values and sources in 03-technology/hydrogen/hydrogen.csv; several are flagged assumptions
+- **hyphen**: Engineering News, Windhoek Express (2026). Hyphen Hydrogen Energy project updates (Tsau Khaeb, near Luderitz). Engineering News (Sep 2026); Windhoek Express (Dec 2025).
+- **assumptions**: ZEN Namibia (2026). ZEN Namibia modelling assumptions. ZEN Namibia, data/raw_data/05-assumptions/zen_namibia_assumptions.csv.

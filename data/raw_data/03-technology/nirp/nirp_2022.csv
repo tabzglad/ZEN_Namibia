@@ -1,0 +1,11 @@
+item,value,unit,source
+van_eck_heat_rate,15.81,GJ/MWh,"NIRP 2022, Van Eck parameters: full-load heat rate (about 22% efficiency); the NIRP also reports a lower efficiency at minimum load, not used"
+van_eck_coal_use,580,kg/MWh,"NIRP 2022, Van Eck parameters: coal use per MWh of electricity at full load; with the heat rate gives the coal energy content (15.81 GJ / 0.58 t)"
+van_eck_variable_om,1.445,N$/kWh,"NIRP 2022 Table 6 Van Eck VO&M; NIRP 2022 report, based on 2020-2021 data"
+van_eck_fixed_om,1692,N$/kW/year,"NIRP 2022 Table 6 Van Eck annual fixed cost; NIRP 2022 report, based on 2020-2021 data"
+anixas_heat_rate,8.03,GJ/MWh,"NIRP 2022, Anixas parameters: full-load heat rate, 8.03 MJ/kWh (about 44.8% efficiency)"
+anixas_net_capacity,21.5,MW,"NIRP 2022, Anixas parameters: net output capacity (NamPower lists 22.5 MW installed)"
+anixas_fixed_om,1517,N$/kW/year,"NIRP 2022 Table 7 Anixas annual fixed cost; NIRP 2022 report, based on 2020-2021 data"
+anixas_variable_om,4.65,N$/kWh,"NIRP 2022 Table 7: 3 x N$1.55/kWh (station-wide variable O&M), based on 2020-2021 data; excludes fuel"
+ruacana_fixed_om,1020,N$/kW/year,"NIRP 2022 Table 5 Ruacana annual fixed cost; NIRP 2022 report, based on 2020-2021 data; variable O&M not applied"
+hfo_delivered_price_2020,173.10,N$/GJ,NIRP 2022 Table 29: assumed delivered HFO price in 2020; split with hfo_fob_nwe_2020 and exchange_rate_2020 into market price and delivery cost to estimate the 2023 delivered price (not used directly)

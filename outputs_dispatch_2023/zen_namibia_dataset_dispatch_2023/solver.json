@@ -7,7 +7,7 @@
     "NodefileDir": "C:\\Users\\glady\\zen_namibia\\ZEN_Namibia\\gurobi_nodefiles"
   },
   "check_unit_consistency": true,
-  "solver_dir": "ZEN_Namibia\\outputs\\solver_files",
+  "solver_dir": "outputs\\solver_files",
   "keep_files": false,
   "io_api": "lp",
   "save_duals": false,

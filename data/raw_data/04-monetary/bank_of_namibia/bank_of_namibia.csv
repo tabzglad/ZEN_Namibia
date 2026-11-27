@@ -1,0 +1,5 @@
+item,value,unit,source
+nad_per_eur_2023,19.9534,N$/EUR,"Bank of Namibia Quarterly Bulletin December 2024, Table IV.J (Foreign Exchange Rates), page 147: 2023 annual average, arithmetic mean of the 12 monthly period-average N$/EUR rates (Jan 18.4177, Feb 19.1750, Mar 19.5627, Apr 19.9258, May 20.7055, Jun 20.3121, Jul 20.1032, Aug 20.4573, Sep 20.2815, Oct 20.1268, Nov 20.0259, Dec 20.3471)"
+nad_per_eur_2020,18.7695,N$/EUR,"Bank of Namibia (bon.com.na): 2020 annual average, arithmetic mean of the 12 monthly average N$/EUR rates (Jan 15.9848, Feb 16.3845, Mar 18.4078, Apr 20.1753, May 19.7631, Jun 19.2866, Jul 19.2132, Aug 20.3815, Sep 19.7274, Oct 19.3719, Nov 18.4020, Dec 18.1360); used to split the NIRP 2020 HFO price into market price and delivery cost"
+cpi_2020,140.6,index (2012=100),Bank of Namibia Quarterly Bulletin March 2026 (file: march 2026.indb): all-items CPI annual average 2020; price basis of the NIRP O&M values
+cpi_2023,167.3,index (2012=100),Bank of Namibia Quarterly Bulletin March 2026 (file: march 2026.indb): all-items CPI annual average 2023; NIRP O&M values are scaled by cpi_2023/cpi_2020 (1.1899)

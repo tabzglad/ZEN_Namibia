@@ -1,0 +1,4 @@
+item,value,unit,source
+biomass_efficiency,0.300,1,"NamPower Otjikoto Biomass Project fact sheet (May 2024): 300,000 MWh per year from 245,000 t of wood chips at 14.7 MJ/kg"
+biomass_energy_content,14.7,GJ/t,"NamPower Otjikoto Biomass Project fact sheet (May 2024), P100 wood chips, 5-15% moisture"
+biomass_fuel_price,908,N$/t,"NamPower Otjikoto fact sheet (May 2024): N$200-245 million per year for wood chips / 245,000 t (midpoint); GIZ policy brief (2018) lists plant-gate prices of N$450, 600 and 750 per tonne"

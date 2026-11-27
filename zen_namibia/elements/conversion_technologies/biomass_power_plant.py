@@ -7,12 +7,13 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.technology.expansion import (
-    committed_projects,
-    expansion_assumptions,
-    investment_costs,
+from zen_namibia.datasets.dataset_collections.technology_costs import TechnologyCosts
+from zen_namibia.datasets.datasets.technology.nampower_otjikoto import NamPowerOtjikoto
+from zen_namibia.datasets.datasets.technology.nampower_projects import (
+    NamPowerCommittedProjects,
+    NamPowerProjectCosts,
 )
-from zen_namibia.utils import capacity_limit_attribute, capacity_lower_limit_attribute
+from zen_namibia.utils import new_technology_capacity_limit
 
 
 class BiomassPowerPlant(ConversionTechnology):
@@ -33,40 +34,22 @@ class BiomassPowerPlant(ConversionTechnology):
         return Attribute(name="output_carrier", default_value=["electricity"], element=self)
 
     def _set_lifetime(self) -> Attribute:
-        return Attribute(
-            "lifetime", default_value=investment_costs(self.source_path).lifetime(self.name),
-            unit="1", element=self,
-        )
+        return NamPowerProjectCosts(self.source_path).get_lifetime(self)
 
     def _set_conversion_factor(self) -> Attribute:
         """Fuel per MWh of electricity: 1 / 30% (Otjikoto fact sheet)."""
-        efficiency = expansion_assumptions(self.source_path).value("biomass_efficiency")
-        return Attribute(
-            name="conversion_factor",
-            default_value=[{"biomass": {"default_value": 1.0 / efficiency, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
-            element=self,
-        )
+        return NamPowerOtjikoto(self.source_path).get_conversion_factor(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        return capacity_limit_attribute(self, 0.0, expandable=True)
+        return new_technology_capacity_limit(self)
 
     def _set_capacity_lower_limit(self) -> Attribute:
-        projects = committed_projects(self.source_path)
-        return capacity_lower_limit_attribute(self, 0.0, lambda y: projects.committed_by(self.name, y))
+        return NamPowerCommittedProjects(self.source_path).get_capacity_lower_limit(self)
 
     def _set_capex_specific_conversion(self) -> Attribute:
         """Otjikoto estimated cost N$2.641 bn / 40 MW."""
-        return Attribute(
-            "capex_specific_conversion",
-            default_value=investment_costs(self.source_path).capex_euro_per_mw(self.name),
-            unit=f"Euro/{self.power_unit}", element=self,
-        )
+        return TechnologyCosts(self.source_path).get_capex_specific_conversion(self)
 
     def _set_opex_specific_fixed(self) -> Attribute:
-        """Assumption: a fixed share of capex per year (assumptions.csv)."""
-        share = expansion_assumptions(self.source_path).value("biomass_fixed_om_share")
-        return Attribute(
-            "opex_specific_fixed",
-            default_value=share * investment_costs(self.source_path).capex_euro_per_mw(self.name),
-            unit=f"Euro/{self.power_unit}", element=self,
-        )
+        """Assumed share of capex per year."""
+        return TechnologyCosts(self.source_path).get_opex_specific_fixed(self)

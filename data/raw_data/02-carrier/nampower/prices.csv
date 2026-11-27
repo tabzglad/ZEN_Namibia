@@ -1,0 +1,5 @@
+item,value,unit,source
+electricity_import_price,1895,N$/MWh,NamPower IAR 2023 note 26(a) and IAR 2024 note 26: import cost / import volume; average of FY2022/23 (180.1 c/kWh) and FY2023/24 (198.9 c/kWh); used for contract imports from Zambia and Zimbabwe and as the cap on the export price
+electricity_export_price,859.25,N$/MWh,"NamPower IAR 2023 note 25: SAPP market sales revenue FY2022/23 (N$170,131k) / exports FY2022/23 (198 GWh, imports_exports.csv); retained for comparison, not used: exports are priced at the monthly SAPP market price (02-carrier/sapp)"
+coal_price,2227,N$/t,NamPower IAR FY2022/23 key statistics: Van Eck coal cost per tonne; used for the 2023 baseline
+coal_price_fy2023_24,2246,N$/t,"NamPower IAR FY2023/24 key statistics: Van Eck coal cost per tonne; retained for comparison, not used in calendar-2023 baseline"

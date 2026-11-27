@@ -7,15 +7,13 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.carrier.nampower import load_costs
-from zen_namibia.datasets.datasets.technology.expansion import (
-    committed_projects,
-    investment_costs,
+from zen_namibia.datasets.dataset_collections.technology_costs import TechnologyCosts
+from zen_namibia.datasets.datasets.technology.nampower_projects import (
+    NamPowerCommittedProjects,
+    NamPowerProjectCosts,
 )
-from zen_namibia.elements.conversion_technologies.anixas_i import (
-    FUEL_INPUT_PER_ELECTRIC_OUTPUT,
-)
-from zen_namibia.utils import capacity_limit_attribute, capacity_lower_limit_attribute
+from zen_namibia.datasets.datasets.technology.nirp import NIRP2022
+from zen_namibia.utils import new_technology_capacity_limit
 
 
 class EnginePowerPlant(ConversionTechnology):
@@ -40,44 +38,25 @@ class EnginePowerPlant(ConversionTechnology):
         return Attribute(name="output_carrier", default_value=["electricity"], element=self)
 
     def _set_lifetime(self) -> Attribute:
-        return Attribute(
-            "lifetime", default_value=investment_costs(self.source_path).lifetime(self.name),
-            unit="1", element=self,
-        )
+        return NamPowerProjectCosts(self.source_path).get_lifetime(self)
 
     def _set_conversion_factor(self) -> Attribute:
-        """Full-load heat rate of Anixas I (NIRP, 8.03 GJ/MWh) as a proxy."""
-        return Attribute(
-            name="conversion_factor",
-            default_value=[{"hfo": {"default_value": FUEL_INPUT_PER_ELECTRIC_OUTPUT, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
-            element=self,
-        )
+        """Full-load heat rate of Anixas I as a proxy."""
+        return NIRP2022(self.source_path).get_conversion_factor(
+            self, "anixas", "hfo", description=", Anixas I used as a proxy for new engines")
 
     def _set_capacity_limit(self) -> Attribute:
-        return capacity_limit_attribute(self, 0.0, expandable=True)
+        return new_technology_capacity_limit(self)
 
     def _set_capacity_lower_limit(self) -> Attribute:
-        projects = committed_projects(self.source_path)
-        return capacity_lower_limit_attribute(self, 0.0, lambda y: projects.committed_by(self.name, y))
+        return NamPowerCommittedProjects(self.source_path).get_capacity_lower_limit(self)
 
     def _set_capex_specific_conversion(self) -> Attribute:
         """Anixas II final cost N$1.325 bn / 54 MW."""
-        return Attribute(
-            "capex_specific_conversion",
-            default_value=investment_costs(self.source_path).capex_euro_per_mw(self.name),
-            unit=f"Euro/{self.power_unit}", element=self,
-        )
+        return TechnologyCosts(self.source_path).get_capex_specific_conversion(self)
 
     def _set_opex_specific_fixed(self) -> Attribute:
-        return Attribute(
-            "opex_specific_fixed",
-            default_value=load_costs(self.source_path).fixed_om("anixas_fixed_om_nirap"),
-            unit=f"Euro/{self.power_unit}", element=self,
-        )
+        return TechnologyCosts(self.source_path).get_opex_specific_fixed(self)
 
     def _set_opex_specific_variable(self) -> Attribute:
-        return Attribute(
-            "opex_specific_variable",
-            default_value=load_costs(self.source_path).variable_om("anixas_variable_om_nirap"),
-            unit="Euro/MWh", element=self,
-        )
+        return TechnologyCosts(self.source_path).get_opex_specific_variable(self)

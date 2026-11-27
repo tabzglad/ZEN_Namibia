@@ -1,0 +1,2 @@
+item,value,unit,source
+hydrogen_storage_compressor_capex,1769,EUR/kW,"Compressor capex per kW of electrical input power: reference cost Cref of the compressor cost function in Rozzi, Minuto and Lanzini (2024), Techno-economic dataset for hydrogen storage-based microgrids, Data in Brief 56:110795, Table 4 (EUR2024, reference size 2,154 kW; units inferred from Table 3). Multiplied by the compression energy share (1 - hydrogen_storage_charge_efficiency) to give the cost per kW of hydrogen charging"

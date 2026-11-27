@@ -1,0 +1,4 @@
+item,value,unit,source
+hydrogen_demand,175000,t/year,"Hyphen Hydrogen Energy Phase 1 (Tsau Khaeb, near Luderitz): 175,000 t/yr green hydrogen for about 1 Mt/yr ammonia (Engineering News, Hyphen project update, Sep 2026; Windhoek Express, Dec 2025)"
+hydrogen_first_year,2028,year,"Hyphen Phase 1 first production expected by 2028 (Engineering News, Sep 2026); hydrogen demand applies from this year"
+hyphen_electrolyser_capacity,1500,MW,"Hyphen Phase 1 electrolyser capacity, 3.75 GW renewables plus batteries (Windhoek Express, Dec 2025); for comparison only, not imposed"

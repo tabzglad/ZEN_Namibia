@@ -3,4 +3,4 @@ photovoltaics,16210,,2025,25,"Sores Gaib (Rosh Pinah) PV, 100 MW, N$1.621 bn","N
 onshore_wind_turbine,28000,,2023,25,"Luderitz wind (Cerim, IPP), 50 MW, N$1.4 bn","NamPower IAR 2022 and 2023; workbook sheet Capex & financial"
 engine_power_plant,24537.04,,2025,25,"Anixas II dual-fuel engines, 54 MW, N$1.325 bn final cost","NamPower IAR 2022, 2024 and 2025; workbook sheet Capex & financial"
 biomass_power_plant,66025,,2025,25,"Otjikoto encroacher-bush biomass, 40 MW, N$2.641 bn","NamPower IAR 2022, 2023 and 2025; workbook sheet Capex & financial; 25-year design life (NamPower Otjikoto fact sheet, May 2024)"
-battery,,9803.92,2025,15,"Omburu BESS, 51 MW / 51 MWh, N$500 m; whole cost put on storage energy (1-hour battery)","NamPower IAR 2024 and 2025; workbook sheet Capex & financial; 15-year lifetime is an assumption"
+battery,,9803.92,2025,,"Omburu BESS, 51 MW / 51 MWh, N$500 m; whole cost put on storage energy (1-hour battery)","NamPower IAR 2024 and 2025; workbook sheet Capex & financial; lifetime in 05-assumptions"

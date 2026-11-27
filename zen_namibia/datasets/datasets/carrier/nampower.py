@@ -1,10 +1,15 @@
+"""NamPower annual reports: demand, trade and prices (02-carrier/nampower/)."""
 from __future__ import annotations
 
-from functools import lru_cache
+from math import inf
 from pathlib import Path
 
 import pandas as pd
-from zen_creator import Dataset, MetaData
+from zen_creator import Attribute, Dataset, Element, MetaData
+from zen_creator.datasets.datasets.metadata import SourceInformation
+
+from zen_namibia.datasets.datasets._item_table import ItemValues, read_item_table
+from zen_namibia.utils import model_years
 
 DEMAND_COLUMNS = [
     "year",
@@ -20,98 +25,29 @@ def nampower_metadata(name: str) -> MetaData:
         name=name,
         title="NamPower annual reports and statistics 2019-2025",
         author=["NamPower"],
-        publication="NamPower Annual Reports",
+        publication="NamPower Integrated Annual Reports",
         publication_year=2025,
         note="compiled in the ZEN Namibia baseline workbook",
     )
 
 
-class NamPowerCosts(Dataset[pd.DataFrame]):
-    """Source table of 2023 fuel and electricity trade price assumptions."""
+class NamPowerPrices(ItemValues, Dataset[pd.DataFrame]):
+    """Average electricity import and export prices and the Van Eck coal price (N$)."""
 
-    name = "nampower_costs"
+    name = "nampower_prices"
 
     def _set_metadata(self) -> MetaData:
-        return MetaData(
-            name=self.name,
-            title="Namibia 2023 fuel and electricity trade price inputs",
-            author=["NamPower", "Bank of Namibia", "ZEN Namibia"],
-            publication="NamPower annual reports and Bank of Namibia bulletin",
-            publication_year=2024,
-            note="Published values and documented conversion assumptions",
-        )
+        return nampower_metadata(self.name)
 
     def _set_path(self) -> Path:
-        return self.source_path / "02-carrier" / "nampower" / "costs_2023.csv"
+        return self.source_path / "02-carrier" / "nampower" / "prices.csv"
 
     def _set_data(self) -> pd.DataFrame:
-        data = pd.read_csv(self.path)
-        required = {"item", "value", "unit", "source"}
-        missing = required.difference(data.columns)
-        if missing:
-            raise ValueError(
-                "costs_2023.csv is missing columns: " + ", ".join(sorted(missing))
-            )
-        if data["item"].duplicated().any():
-            raise ValueError("costs_2023.csv has duplicate items")
-        data["value"] = pd.to_numeric(data["value"], errors="raise")
-        if data.isna().any().any() or (data["value"] <= 0).any():
-            raise ValueError("costs_2023.csv contains blank or non-positive values")
+        data = read_item_table(self.path)
+        if (data["value"] <= 0).any():
+            raise ValueError("prices.csv has non-positive values")
         return data
 
-    def value(self, item: str) -> float:
-        rows = self.data.loc[self.data.item == item, "value"]
-        if len(rows) != 1:
-            raise ValueError(f"Expected one costs_2023.csv row for {item}; found {len(rows)}")
-        return float(rows.iloc[0])
-
-    def to_euro(self, nad: float) -> float:
-        return nad / self.value("exchange_rate")
-
-    def electricity_price(self, direction: str) -> float:
-        return self.to_euro(self.value(f"electricity_{direction}_price"))
-
-    def coal_price(self) -> float:
-        # Fuel MWh per tonne from the NIRP heat rate and coal use.
-        fuel_mwh_per_tonne = (15.81 / 3.6) / (580.0 / 1000.0)
-        return self.to_euro(self.value("coal_price") / fuel_mwh_per_tonne)
-
-    def anixas_hfo_price(self) -> float:
-        """Estimate the 2023 delivered HFO price for Anixas in Euro/MWh of fuel.
-
-        The NIRP 2020 delivered price is split into the 2020 market price
-        (NW Europe HFO 380 cst FOB) and a delivery cost (shipping, inland
-        transport, handling, margins). The 2023 price is the 2023 market
-        price plus the 2020 delivery cost scaled to 2023 prices with CPI.
-        """
-        gj_per_tonne = self.value("hfo_energy_content")
-        fob_2020 = self.value("hfo_fob_nwe_2020") / gj_per_tonne * self.value("exchange_rate_2020")
-        delivery_2020 = self.value("anixas_hfo_price_2020") - fob_2020
-        if delivery_2020 <= 0:
-            raise ValueError("NIRP 2020 HFO price must exceed the 2020 FOB market price")
-        fob_2023 = self.value("hfo_fob_nwe_2023") / gj_per_tonne * self.value("exchange_rate")
-        delivered_2023 = fob_2023 + delivery_2020 * self.nirp_to_2023()  # N$/GJ
-        return self.to_euro(delivered_2023 * 3.6)
-
-    def nirp_to_2023(self) -> float:
-        """CPI factor from the NIRP's 2020 price basis to 2023 prices."""
-        return self.value("cpi_2023") / self.value("cpi_2020")
-
-    def variable_om(self, item: str) -> float:
-        """Convert NIRP N$/kWh (2020 prices) to 2023 Euro/MWh of electricity."""
-        return self.to_euro(self.value(item) * 1000.0 * self.nirp_to_2023())
-
-    def fixed_om(self, item: str) -> float:
-        """Convert NIRP N$/kW/year (2020 prices) to 2023 Euro/MW/year."""
-        return self.to_euro(self.value(item) * 1000.0 * self.nirp_to_2023())
-
-    def usd_fixed_om(self, item: str) -> float:
-        """Convert a 2023 USD/kW/year O&M value to Euro/MW/year.
-
-        Uses the 2023 USD/EUR rate only. IRENA's technology O&M costs are
-        not scaled with Namibian CPI, because they have fallen over time.
-        """
-        return self.value(item) * 1000.0 / self.value("usd_per_eur_2023")
 
 class NamPowerTrade(Dataset[pd.DataFrame]):
     """NamPower's annual imports and exports (imports_exports.csv)."""
@@ -135,19 +71,34 @@ class NamPowerTrade(Dataset[pd.DataFrame]):
         year = int(self.data.index.max())
         return year, float(self.data.loc[year, "exports_gwh"])
 
-
-@lru_cache(maxsize=None)
-def load_costs(source_path: Path | str) -> NamPowerCosts:
-    """Load and cache the NamPower 2023 cost inputs for a source folder."""
-    return NamPowerCosts(source_path)
+    def get_availability_export_yearly(self, element: Element, node: str) -> Attribute:
+        """Annual exports at the export node: unbounded in the reference year
+        (calibrated 2023 run); in later years capped at NamPower's latest
+        reported exports, so that new capacity is built for Namibia and
+        hydrogen, not for sales into SAPP at a fixed price."""
+        year_reported, exports_gwh = self.latest_exports_gwh()
+        reference_year = element.config.system.reference_year
+        years = model_years(element)
+        df = pd.DataFrame(
+            {"availability_export_yearly": [
+                inf if year == reference_year else exports_gwh * 1000.0 for year in years
+            ]},
+            index=pd.MultiIndex.from_tuples([(node, y) for y in years], names=["node", "year"]),
+        )
+        return element.availability_export_yearly.set_data(
+            default_value=inf, unit=f"{element.power_unit}*h", df=df,
+            source=SourceInformation(
+                description=(
+                    f"Exports at {node} unbounded in {reference_year}; in later years capped at "
+                    f"NamPower's {year_reported} exports ({exports_gwh:,.0f} GWh)."
+                ),
+                metadata=self.metadata,
+            ),
+        )
 
 
 class NamPowerDemand(Dataset[pd.DataFrame]):
-    """NamPower annual electricity demand 2019-2025.
-
-    The files are in ``02-carrier/nampower/``. ``imports_exports.csv`` is kept
-    there as well but is not used by the model at the moment.
-    """
+    """NamPower annual electricity demand 2019-2025."""
 
     name = "nampower_demand"
 
@@ -186,45 +137,3 @@ class NamPowerDemand(Dataset[pd.DataFrame]):
         if rows.empty:
             raise ValueError(f"No demand data for {year} in demand.csv")
         return rows.iloc[0]
-
-
-class NamPowerImportContracts(Dataset[pd.DataFrame]):
-    """NamPower's bilateral import contracts (ZESCO, ZPC, Eskom) and SAPP trade."""
-
-    name = "nampower_import_contracts"
-
-    def _set_metadata(self) -> MetaData:
-        return MetaData(
-            name=self.name,
-            title="NamPower electricity import contracts",
-            author=["NamPower"],
-            publication="Namibian, Zambian and Zimbabwean press reports",
-            publication_year=2024,
-            note="Contract sizes from press reports; contract prices are not published",
-        )
-
-    def _set_path(self) -> Path:
-        return self.source_path / "02-carrier" / "nampower" / "import_contracts.csv"
-
-    def _set_data(self) -> pd.DataFrame:
-        data = pd.read_csv(self.path)
-        required = {"supplier", "node", "contract_mw", "cap_in_model"}
-        missing = required.difference(data.columns)
-        if missing:
-            raise ValueError(
-                "import_contracts.csv is missing columns: " + ", ".join(sorted(missing))
-            )
-        flags = data["cap_in_model"].str.strip().str.lower()
-        if not flags.isin(["yes", "no"]).all():
-            raise ValueError("import_contracts.csv cap_in_model must be yes or no")
-        data["cap_in_model"] = flags == "yes"
-        data["contract_mw"] = pd.to_numeric(data["contract_mw"], errors="raise")
-        capped = data.loc[data["cap_in_model"]]
-        if capped["contract_mw"].isna().any() or (capped["contract_mw"] <= 0).any():
-            raise ValueError("import_contracts.csv needs a positive contract_mw for capped contracts")
-        return data
-
-    def import_caps_mw(self) -> pd.Series:
-        """Hourly import limit per node in MW from the capped contracts."""
-        capped = self.data.loc[self.data["cap_in_model"]]
-        return capped.groupby("node")["contract_mw"].sum()

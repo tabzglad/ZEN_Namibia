@@ -31,18 +31,30 @@ The dataset and output folder names are set in `global_vars.py` and
 - `data/raw_data/` — raw inputs, one folder per source
   (`<category>/<source>/`, as in ZEN-europe); see `data/raw_data/README.md`
   for files, sources and assumptions
-- `zen_namibia/elements/` — carrier, technology and energy-system definitions
-  (edit these to change assumptions)
-- `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand and `costs_2023.csv`, including the CPI scaling of NIRP O&M and the 2023 HFO price estimate),
-  `carrier/pypsa.py` (hourly demand shape), `carrier/nirp.py` (NIRP demand growth rate), `carrier/sapp.py` (SAPP monthly
-  time-of-use market prices), `technology/renewables_ninja.py`
-  (wind/solar profiles, hydro weather), `technology/nampower.py` (NamPower
-  capacities), `technology/sapp.py` (SAPP interconnector transfer limits) and `technology/manual_renewable_plants.py` (own list of
-  wind/solar plants).
+The code follows the ZEN-europe conventions
+([extending guide](https://zen-europe.readthedocs.io/en/latest/files/developer_guide/extending.html)):
+data flows raw file → dataset (one source) → dataset collection (combines
+sources) → element. Every attribute is set through `set_data(...,
+source=...)`, so each element folder of the built dataset has a `sources.md`
+listing where its values come from.
+
+- `zen_namibia/elements/` — carriers, technologies and the energy system. Each
+  `_set_<attribute>()` only chooses a dataset, collection or assumption; it
+  does not read or transform data.
+- `zen_namibia/datasets/datasets/` — one dataset class per source, by
+  category: `energy_system/` (model nodes), `carrier/` (NamPower demand, trade
+  and prices; import contracts; NIRP demand growth; PyPSA demand shape; SAPP
+  market prices; INSEE HFO prices; Hyphen hydrogen project), `technology/`
+  (NamPower capacities and plant performance; NamPower project costs and
+  committed projects; Otjikoto fact sheet; NIRP 2022 plant data; IRENA;
+  IEA; US DOE; Rozzi et al.; Renewables.ninja; SAPP transfer limits; own
+  list of wind/solar plants), `financial/` (Bank of Namibia exchange rates and
+  CPI; ECB exchange rates) and `assumptions/` (all of ZEN Namibia's own
+  modelling assumptions, from `05-assumptions/zen_namibia_assumptions.csv`).
 - `zen_namibia/datasets/dataset_collections/` — combine several sources:
-  `electricity_demand.py` (PyPSA shape scaled to NamPower totals) and
-  `renewable_fleet.py` (plant list + Renewables.ninja profiles + NamPower's
-  Omburu PV)
+  electricity demand and trade, fuel prices, technology costs, hydrogen
+  demand and technology costs, renewable fleet, hydro and thermal
+  availability, interconnectors, and currency conversion.
 - `create_model.py` — builds and writes the dataset (existing-capacity
   vintages are set in the technology classes)
 - `run_zen_garden.py` — solves the built dataset
@@ -61,8 +73,9 @@ The dataset and output folder names are set in `global_vars.py` and
   default run optimizes 2023 only. The fleet stays fixed at 2023 unless
   `allow_investment` is switched on.
 - Natural gas is not included until sourced 2023 capacity and fuel data are available.
-- Import/export prices, Van Eck coal price, and Anixas I estimated 2023 HFO price are
-  read from `data/raw_data/02-carrier/nampower/costs_2023.csv`. Van Eck, Anixas I
+- Import/export prices and the Van Eck coal price are NamPower's
+  (`02-carrier/nampower/prices.csv`); the Anixas I 2023 HFO price is estimated
+  from the NIRP 2020 price and INSEE market prices (`FuelPrices`). Van Eck, Anixas I
   and Ruacana O&M come from the NIRP (2020–2021 values); NIRP values are scaled to
   2023 prices with CPI. PV and wind fixed O&M come from IRENA (PV 2023 survey,
   wind Africa 2021) and are not CPI-scaled, because these costs have fallen.

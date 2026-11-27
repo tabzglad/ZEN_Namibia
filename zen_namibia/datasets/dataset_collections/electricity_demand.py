@@ -11,6 +11,7 @@ from zen_creator.utils.attribute import SourceInformation
 from zen_namibia.datasets.datasets.carrier.nampower import NamPowerDemand
 from zen_namibia.datasets.datasets.carrier.nirp import NIRPDemandGrowth
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR, PyPSA
+from zen_namibia.utils import model_years
 
 
 class ElectricityDemand(DatasetCollection):
@@ -49,12 +50,8 @@ class ElectricityDemand(DatasetCollection):
 
     def yearly_variation(self, element: Element) -> pd.DataFrame:
         """Demand in each optimized year relative to the reference year."""
-        system = element.config.system
-        years = [
-            system.reference_year + i * system.interval_between_years
-            for i in range(system.optimized_years)
-        ]
-        base = self.energy_gwh(system.reference_year)
+        years = model_years(element)
+        base = self.energy_gwh(element.config.system.reference_year)
         return pd.DataFrame(
             {"NAM": [self.energy_gwh(year) / base for year in years]},
             index=pd.Index(years, name="year"),
@@ -103,8 +100,8 @@ class ElectricityDemand(DatasetCollection):
         """Create the 8760-hour demand profile for the configured reference year."""
         reference_year = element.config.system.reference_year
         profile_year = self.data["pypsa"].profile_year
-        attr = Attribute("demand", element=element)
-        attr.set_data(
+        rate = self.data["nirp_growth"].annual_growth_rate()
+        return element.demand.set_data(
             default_value=0.0,
             unit=element.power_unit,
             df=self._profile_for_year(reference_year),
@@ -116,9 +113,8 @@ class ElectricityDemand(DatasetCollection):
                     f"annual energy and peak for {profile_year}, flat annual "
                     "average otherwise. Later optimized years scale the profile "
                     "with NamPower reported energy, then NIRP 2022 growth of "
-                    "2.7% per year."
+                    f"{rate:.1%} per year."
                 ),
                 metadata=self.metadata,
             ),
         )
-        return attr

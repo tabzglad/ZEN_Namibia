@@ -1,0 +1,5 @@
+node,country,lon,lat,role,description
+NAM,Namibia,17.0658,-22.5609,domestic,"Namibia: all demand and plants; no imports or exports at this node. Coordinates of Windhoek"
+ZAF,South Africa,28.1881,-25.7461,sapp_market,"SAPP market and Eskom: imports at the SAPP price; the only node that exports. Coordinates of Pretoria"
+ZMB,Zambia,28.2833,-15.4167,contract,"ZESCO import contract. Coordinates of Lusaka"
+ZWE,Zimbabwe,31.0522,-17.8292,contract,"ZPC import contract; reaches Namibia through Zambia. Coordinates of Harare"

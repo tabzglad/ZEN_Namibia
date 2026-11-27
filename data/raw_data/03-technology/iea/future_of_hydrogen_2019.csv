@@ -1,0 +1,3 @@
+item,value,unit,source
+electrolyser_efficiency,0.69,1,"IEA (2019) The Future of Hydrogen, assumptions annex: 2030 electrolyser efficiency (LHV); to be checked against the IEA Global Hydrogen Review"
+electrolyser_fixed_om_share,0.015,1/year,"IEA (2019) The Future of Hydrogen, assumptions annex: fixed O&M as a share of capex per year"

@@ -14,7 +14,6 @@ PRICE_COLUMNS = [
     "off_peak_usc_per_kwh",
     "standard_usc_per_kwh",
     "peak_usc_per_kwh",
-    "usd_per_eur",
 ]
 TOU_COLUMNS = {
     "off_peak": "off_peak_usc_per_kwh",
@@ -61,7 +60,10 @@ def tou_periods(hours: pd.DatetimeIndex) -> np.ndarray:
 
 
 class SAPPMarketPrices(Dataset[pd.DataFrame]):
-    """SAPP day-ahead market (DAM) monthly prices 2023: average and by time of use."""
+    """SAPP day-ahead market (DAM) monthly prices 2023 in USD: average and by time of use.
+
+    The time-of-use hours are Eskom's Megaflex periods (see tou_periods).
+    """
 
     name = "sapp_market_prices"
 
@@ -69,14 +71,14 @@ class SAPPMarketPrices(Dataset[pd.DataFrame]):
         return MetaData(
             name=self.name,
             title="SAPP monthly market performance reports 2023",
-            author=["Southern African Power Pool", "European Central Bank"],
-            publication="SAPP Market Performance Reports; ECB euro reference rates",
+            author=["Southern African Power Pool"],
+            publication="SAPP Market Performance Reports",
             publication_year=2023,
             url="https://www.sapp.co.zw/market-reports",
             note=(
                 "Monthly average DAM clearing price and monthly average off-peak, "
-                "standard and peak prices (USc/kWh), converted with the ECB monthly "
-                "USD/EUR rate; hours mapped to periods with Eskom's Megaflex definitions"
+                "standard and peak prices (USc/kWh); hours mapped to periods with "
+                "Eskom's Megaflex definitions"
             ),
         )
 
@@ -103,20 +105,20 @@ class SAPPMarketPrices(Dataset[pd.DataFrame]):
             raise ValueError(f"dam_prices_2023.csv needs 12 months for {year}; found {len(data)}")
         return data
 
-    def monthly_euro_per_mwh(self, year: int, column: str = "mcp_usc_per_kwh") -> pd.Series:
-        """Monthly price in Euro/MWh: USc/kWh x 10 = USD/MWh, divided by USD/EUR."""
-        data = self._year(year)
-        return data[column] * 10.0 / data["usd_per_eur"]
+    def monthly_usd_per_mwh(self, year: int, period: str = "average") -> pd.Series:
+        """Monthly price in USD/MWh (USc/kWh x 10) for the monthly average
+        ("average") or a time-of-use period ("off_peak", "standard", "peak")."""
+        column = "mcp_usc_per_kwh" if period == "average" else TOU_COLUMNS[period]
+        return self._year(year)[column] * 10.0
 
-    def hourly_euro_per_mwh(self, year: int) -> np.ndarray:
-        """Price for every hour of the year (8760 values): the month's
-        off-peak, standard or peak price, by the hour's time-of-use period."""
+    def hourly_from_monthly(self, year: int, monthly: dict[str, pd.Series]) -> np.ndarray:
+        """Spread monthly prices per time-of-use period over every hour of the
+        year (8760 values): each hour gets its month's price for its period."""
         hours = pd.date_range(f"{year}-01-01", periods=STEPS_PER_YEAR, freq="h")
         months = hours.to_period("M")
         periods = tou_periods(hours)
         prices = np.empty(STEPS_PER_YEAR)
-        for period, column in TOU_COLUMNS.items():
-            monthly = self.monthly_euro_per_mwh(year, column)
+        for period in TOU_COLUMNS:
             mask = periods == period
-            prices[mask] = monthly.loc[months[mask]].to_numpy()
+            prices[mask] = monthly[period].loc[months[mask]].to_numpy()
         return prices
