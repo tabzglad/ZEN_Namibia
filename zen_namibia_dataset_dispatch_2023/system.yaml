@@ -5,8 +5,8 @@ set_nodes:
 - ZWE
 reference_year: 2023
 unaggregated_time_steps_per_year: 8760
-aggregated_time_steps_per_year: 8760
-conduct_time_series_aggregation: false
+aggregated_time_steps_per_year: 2000
+conduct_time_series_aggregation: true
 optimized_years: 2
 interval_between_years: 7
 use_rolling_horizon: false

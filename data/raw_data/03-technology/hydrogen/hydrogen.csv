@@ -11,3 +11,4 @@ hydrogen_storage_capex,700,USD/kg,"US DOE hydrogen delivery technical targets: s
 hydrogen_storage_charge_efficiency,0.93,1,"Assumption: about 2.3 kWh/kg compression energy, modelled as a hydrogen loss on charging"
 hydrogen_storage_fixed_om_share,0.02,1/year,"Assumption: fixed O&M as a share of capex per year"
 hydrogen_storage_lifetime,30,year,"Assumption: pressure vessel lifetime"
+hydrogen_storage_compressor_capex,1769,EUR/kW,"Compressor capex per kW of electrical input power: reference cost Cref of the compressor cost function in Rozzi, Minuto and Lanzini (2024), Techno-economic dataset for hydrogen storage-based microgrids, Data in Brief 56:110795, Table 4 (EUR2024, reference size 2,154 kW; units inferred from Table 3). Multiplied by the compression energy share (1 - hydrogen_storage_charge_efficiency) to give the cost per kW of hydrogen charging"

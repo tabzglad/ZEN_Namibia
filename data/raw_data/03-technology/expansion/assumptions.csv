@@ -8,3 +8,4 @@ battery_round_trip_efficiency,0.90,1,"Assumption: typical lithium-ion round-trip
 battery_fixed_om_share,0.025,1/year,"Assumption: fixed O&M as a share of capex per year"
 battery_duration,1,h,"Omburu BESS, 51 MW / 51 MWh (NamPower IAR 2025)"
 wind_capacity_factor,0.348,1,"NamPower IAR 2022: P50 yield of 122,000 MWh/yr from the 40 MW Rosh Pinah wind farm (cancelled because the wind resource was lower than expected); used to scale the Renewables.ninja Ombepo profile (about 51%)"
+value_of_lost_load,10000,EUR/MWh,"Assumption: cost of unmet electricity demand, as in ZEN-europe (price_shed_demand of 10,000 EUR/MWh); high enough that the model only leaves demand unmet when supply and imports cannot cover it"

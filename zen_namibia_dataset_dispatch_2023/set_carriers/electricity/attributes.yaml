@@ -26,5 +26,5 @@ carbon_intensity_carrier_export:
   default_value: 0.0
   unit: kilotons/MWh
 price_shed_demand:
-  default_value: inf
+  default_value: 10000.0
   unit: Euro/MWh

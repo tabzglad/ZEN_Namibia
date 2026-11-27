@@ -49,6 +49,12 @@ class HydrogenAssumptions(Dataset[pd.DataFrame]):
         """Capex per MW of electricity input."""
         return self._usd_to_euro(self.value("electrolyser_capex") * 1000.0)
 
+    def storage_compressor_capex_euro_per_mw(self) -> float:
+        """Compressor cost per MW of hydrogen charging: EUR/kW of compressor
+        power times the compression energy per unit of hydrogen charged."""
+        compression_share = 1.0 - self.value("hydrogen_storage_charge_efficiency")
+        return self.value("hydrogen_storage_compressor_capex") * 1000.0 * compression_share
+
     def storage_capex_euro_per_mwh(self) -> float:
         """Capex per MWh of stored hydrogen (LHV)."""
         return self._usd_to_euro(self.value("hydrogen_storage_capex") / self.value("hydrogen_lhv") * 1000.0)

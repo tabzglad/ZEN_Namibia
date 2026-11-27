@@ -20,6 +20,7 @@ from zen_namibia.datasets.datasets.carrier.nampower import (
 )
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR
 from zen_namibia.datasets.datasets.carrier.sapp import SAPPMarketPrices
+from zen_namibia.datasets.datasets.technology.expansion import expansion_assumptions
 from zen_namibia.elements.energy_systems.energy_system_namibia import (
     DOMESTIC_NODE,
     NODES,
@@ -39,6 +40,16 @@ class Electricity(Carrier):
     def _set_demand(self) -> Attribute:
         """Set the hourly electricity demand (PyPSA shape, NamPower totals)."""
         return ElectricityDemand(self.source_path).get_demand(self)
+
+    def _set_price_shed_demand(self) -> Attribute:
+        """Unmet demand is allowed at the value of lost load (assumptions.csv),
+        so shortages show up in the results instead of making the model
+        infeasible."""
+        return Attribute(
+            "price_shed_demand",
+            default_value=expansion_assumptions(self.source_path).value("value_of_lost_load"),
+            unit=f"Euro/({self.power_unit}*h)", element=self,
+        )
 
     def _hourly_limits(self, name: str, limits_mw: dict[str, float]) -> Attribute:
         """Constant hourly limits per node; nodes not listed are unbounded."""

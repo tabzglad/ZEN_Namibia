@@ -13,7 +13,8 @@ from zen_namibia.utils import capacity_limit_attribute
 
 class HydrogenStorage(StorageTechnology):
     """Compressed hydrogen tanks, so electrolysers can follow wind and sun
-    while the hydrogen demand stays flat. All cost is on stored energy."""
+    while the hydrogen demand stays flat. Tanks are costed per MWh stored and
+    compressors per MW of charging power."""
 
     name: str = "hydrogen_storage"
 
@@ -43,6 +44,23 @@ class HydrogenStorage(StorageTechnology):
         return capacity_limit_attribute(
             self, 0.0, expandable=True, name="capacity_limit_energy",
             unit=f"{self.power_unit}*h",
+        )
+
+    def _set_capex_specific_storage(self) -> Attribute:
+        """Compressor cost per MW of charging power (hydrogen.csv). Without it,
+        the power rating costs nothing and its optimal size is arbitrary."""
+        return Attribute(
+            "capex_specific_storage",
+            default_value=hydrogen_assumptions(self.source_path).storage_compressor_capex_euro_per_mw(),
+            unit=f"Euro/{self.power_unit}", element=self,
+        )
+
+    def _set_opex_specific_fixed(self) -> Attribute:
+        return Attribute(
+            "opex_specific_fixed",
+            default_value=self._h2("hydrogen_storage_fixed_om_share")
+            * hydrogen_assumptions(self.source_path).storage_compressor_capex_euro_per_mw(),
+            unit=f"Euro/{self.power_unit}", element=self,
         )
 
     def _set_capex_specific_storage_energy(self) -> Attribute:

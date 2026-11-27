@@ -10,8 +10,12 @@ system:
     - ZWE
   reference_year: 2023
   unaggregated_time_steps_per_year: 8760
-  aggregated_time_steps_per_year: 8760
-  conduct_time_series_aggregation: false
+  # Time-series aggregation: the 8760 hours are clustered into this many
+  # representative hours (e.g. 500-2000; more is slower but closer to 8760). Storage levels
+  # still follow the full year in order. Set conduct_time_series_aggregation
+  # to false to solve all 8760 hours.
+  aggregated_time_steps_per_year: 2000
+  conduct_time_series_aggregation: true
   # 2023 (calibrated fleet, no new capacity) and 2030 (demand growth from
   # NIRP 2.7%/yr after 2025; committed projects plus optional investment).
   optimized_years: 2

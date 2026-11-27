@@ -1,5 +1,5 @@
 {
-  "dataset": "zen_namibia_dataset_dispatch_2023",
+  "dataset": "ZEN_Namibia\\zen_namibia_dataset_dispatch_2023",
   "objective": "total_cost",
   "sense": "min",
   "subsets": {
@@ -45,7 +45,7 @@
     "representationMethod": "mean",
     "resolution": 1
   },
-  "folder_output": "outputs_dispatch_2023",
+  "folder_output": "ZEN_Namibia\\outputs_dispatch_2023",
   "overwrite_output": true,
   "output_format": "h5",
   "output_version": 4,
