@@ -35,3 +35,59 @@ Details and sources: `data/raw_data/README.md`.
 5. **Demand growth:** check 2.7% in the NIRP 2022 itself (Ch. 3, App. A2).
 6. **Hydrogen:** rerun and read results; check the no-imports-for-hydrogen rule (compare 2030 imports with a run without hydrogen, add an import cap if they rise); verify the 69% electrolyser efficiency (IEA); add ammonia synthesis and desalination electricity; existing PV/wind are charged capex in 2023 (+€15.5M).
 7. **Later:** line losses; Angola and Botswana links.
+
+
+## Jans comments
+
+### Structural comments
+- For many items, you just set the attribute like this (see in biomass.py):
+```python
+return Attribute(
+    "price_import",
+    default_value=expansion_assumptions(self.source_path).biomass_fuel_price(),
+    unit=f"Euro/({self.power_unit}*h)", element=self,
+)
+```
+Which means that the source.md is not created. Ideally you should refer to a dataset or dataset collection entry (which you do here, but you didnt define a `get_price_import(element)` in the dataset entry, which should return  `element.price_import.set_data(...,source=SourceInformation(...))`).
+
+You can compare your implementation with the one in Zen_Europe, to see how it should be done (that way you also create a source.md file in the output folder). See the documentation here: https://zen-europe.readthedocs.io/en/latest/files/developer_guide/extending.html#expose-attributes-through-get-attribute
+
+- The conventions for dataset/ dataset collection definitions are not met. In your case a dataset actually contains multiple sources (see e.g. NamPowerCosts, which is a combination of multiple source `["NamPower", "Bank of Namibia", "ZEN Namibia"]`). Each of them should have their individual dataset. You can read up on the conventions here: https://zen-europe.readthedocs.io/en/latest/files/developer_guide/extending.html#one-source-one-dataset. 
+
+- the elements should not read or transform data (this is done in the dataset/ dataset collections). `anixas_i.py` hardcodes the heat rate and the 21.5 MW net capacity.
+
+- In the raw data: split files that mix sources into individual files (one file - one source and one dataset class).
+
+- You can use dataset collections as you do now when you have combined datasets. A simple example is e.g. import/export prices for HFO, which is a combination of INSEE, NIRP and CPI, exchange rate) 
+
+- CPI and exchange rates ccan go into `raw_data/04-monetary` and `datasets/financial`
+
+- Whereever you make your own assumptions (which is totally fine!) just create one file in the raw_data and a corresponding dataset.
+
+- You can check that each element folder in the final dataset has a sources.md file.
+
+### Model comments
+- Take into account exiting capacities and planned capacities, but also allow for a "generic" expansion. I.e. you can just build onshore wind, pv, etc. without having to specify a specific project. 
+- If possible, I would suggest to have a higher spatial resolution of namibia (not neighboring countries), e.g. with 2-4 nodes in Namibia itself with respective power transmission between them. This is to capture spatial effects as well - e.g. you can only produce H2 at the coast.
+- You can easily reduce the number of hours the model uses (Zen Europe only uses 5 hours, but I think you can go to 100-1000 hours).
+
+### Scneario comments
+
+- **Modelling electricity access and demand growth:** You currently assume an annual demand growth of 2.7%, which feels to me like a growth without an increase of access to electricity. I would suggest you also calculate (in addition to the current demand growth), the growth that would happen if everyone who does not have electricity today had electricity in 2040. You can essentially calculate the average electricity demand of a person today with electricity access, and scale that then to the total population in 2040. I would still suggest to keep the 2.7% growth as a general growth per capita ontop of the access growth. I suggest to then degine different scenarios: 
+    - 2.7% growth per capita (constant electricity access rate)
+    - 1-2 scenarios in between, e.g. electricity access targets of 80% and 90% or so
+    - 2.7% growth per capita + access growth (everyone has electricity in 2040)
+    - 
+- **Modeling a budget:** I suggest to have the following scenarios (aligning with your MS teams message):
+  - Domestic access priority: For 2030 and 2040: no hydrogen production with 3-4 different electricity access rates (see point above) -> Setting the baseline of how much does it cost to provide electricity access.
+  - Hydrogen production in island mode for export: No interaction with the grid, but hydrogen production is allowed with additional solar/wind capacity. Technically, you do not need to run the full model then, because the H2 production is completly independent of the rest of the energy system. You can either define a H2 demand and calculate the respective cost for H2 or directly define a H2 price.
+  - Hydrogen production with grid connection for export: Domestic access + hydrogen production with grid connection. Again with different access rates. Either with a H2 demand or a H2 price.
+  - Integrated hydrogen system: Hydrogen production with grid connection for export and for domestic use. Again with different access rates. 
+- You can either implicitly then calculate the budget from each scenario or explicitly define a budget that Namibia can spend on its energy system. We can talk about this in more detail - but this is independent from the scenario definitions.
+
+
+### Midterm presentation
+- Next week Thursday in the group meeting.
+- 10 min presentation + Q&A
+- Focus on the model that you build so far and show results for the runs of 2023 (potentially also for 2030 and 2040, if you have them)
+- Then show the scenario definitions that you are planning to run.
