@@ -1,0 +1,11 @@
+line,node_from,node_to,voltage_kv,circuits,length_km,commissioned,in_model,source
+ruacana_kunene_omburu,NAM_NORTH,NAM_COAST,330,1,,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 4931 (Ruacana-Omburu 330 kV)"
+omburu_gerus,NAM_COAST,NAM_NORTH,220,1,,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 2455 (Omburu-Gerus 220 kV)"
+van_eck_kuiseb_walmund,NAM_CENTRAL,NAM_COAST,220,1,294,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 6363 (Walmund-Kuiseb); length from the ABB contract notice (nsenergybusiness.com/?p=111933)"
+van_eck_omburu,NAM_CENTRAL,NAM_COAST,220,1,165,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 4935 (Omburu-Van Eck)"
+van_eck_osona_omburu,NAM_CENTRAL,NAM_COAST,220,1,162.3,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 4935 (Van Eck-Osona-Omburu)"
+auas_kokerboom,NAM_CENTRAL,NAM_SOUTH,400,1,,existing,yes,"World Bank (2023) Transmission Expansion and Energy Storage Project P177328, Appraisal ESRS, Section D.1: existing 400 kV Auas-Kokerboom line (built c. 1999, part of the Aries-Auas line)"
+auas_hardap,NAM_CENTRAL,NAM_SOUTH,220,2,,existing,yes,"MEFT EIA portal, NamPower ECC renewal, project 2456 (Auas-Hardap 1 and 2)"
+auas_gerus,NAM_CENTRAL,NAM_NORTH,400,1,287,2024,yes,"Windhoek Express (29 Apr 2024) 'Alweendo switches on 400 kV transmission line': Auas-Gerus 400 kV, 287 km, in service April 2024"
+auas_kokerboom_2,NAM_CENTRAL,NAM_SOUTH,400,1,460,2028,yes,"World Bank (2023) P177328 Appraisal ESRS, Section D.1, and Windhoek Observer (2026) 'NamPower advances major grid expansion under transmission master plan': second Auas-Kokerboom 400 kV line, 458-465 km, expected 2028"
+kokerboom_namib,NAM_SOUTH,NAM_SOUTH,132,2,310,existing,no,"MEFT EIA portal, NamPower ECC renewal, project 5654 (Kokerboom-Namib 1 and 2, 309 and 312 km, built 1991 and 2006): the only lines to Luderitz; inside the South node, so not modelled"

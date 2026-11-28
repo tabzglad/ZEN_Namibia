@@ -11,21 +11,40 @@ capacity_existing
 -----------------
 
 Step 1
-SAPP applicable transfer limit per direction (model_limit_mw in interconnectors.csv; parallel lines summed; the listed direction is assumed for the reverse direction too).
+Lines in service in 2023: SAPP transfer limit per direction for the cross-border lines; for NamPower's internal corridors, the circuits in service times an assumed capacity per circuit by voltage (surge impedance loading).
 
-**Citation**
+**Citations**
 
-Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **sapp_transfer_limits**: Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **manual_transmission**: ZEN Namibia (2026). NamPower transmission lines between the model's Namibian nodes. ZEN Namibia, data/raw_data/03-technology/manual_transmission/corridors.csv.. Note: Compiled from NamPower ECC renewal applications (MEFT EIA portal, 2020-2025), World Bank P177328 appraisal (2023), Windhoek Express (2024) and Windhoek Observer (2026)
+- **assumptions**: ZEN Namibia (2026). ZEN Namibia modelling assumptions. ZEN Namibia, data/raw_data/05-assumptions/zen_namibia_assumptions.csv.
+- **manual_nodes**: ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Namibian nodes group the administrative regions; coordinates of a main town
 
 capacity_limit
 --------------
 
 Step 1
-Lines are not expandable: each edge is capped at its transfer limit.
+Lines in service in each year, not expandable beyond them: SAPP transfer limit per direction for the cross-border lines; for NamPower's internal corridors, the circuits in service times an assumed capacity per circuit by voltage (surge impedance loading).
 
-**Citation**
+**Citations**
 
-Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **sapp_transfer_limits**: Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **manual_transmission**: ZEN Namibia (2026). NamPower transmission lines between the model's Namibian nodes. ZEN Namibia, data/raw_data/03-technology/manual_transmission/corridors.csv.. Note: Compiled from NamPower ECC renewal applications (MEFT EIA portal, 2020-2025), World Bank P177328 appraisal (2023), Windhoek Express (2024) and Windhoek Observer (2026)
+- **assumptions**: ZEN Namibia (2026). ZEN Namibia modelling assumptions. ZEN Namibia, data/raw_data/05-assumptions/zen_namibia_assumptions.csv.
+- **manual_nodes**: ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Namibian nodes group the administrative regions; coordinates of a main town
+
+capacity_lower_limit
+--------------------
+
+Step 1
+Lines in service in each later year must be built, including those commissioned after the reference year: SAPP transfer limit per direction for the cross-border lines; for NamPower's internal corridors, the circuits in service times an assumed capacity per circuit by voltage (surge impedance loading).
+
+**Citations**
+
+- **sapp_transfer_limits**: Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **manual_transmission**: ZEN Namibia (2026). NamPower transmission lines between the model's Namibian nodes. ZEN Namibia, data/raw_data/03-technology/manual_transmission/corridors.csv.. Note: Compiled from NamPower ECC renewal applications (MEFT EIA portal, 2020-2025), World Bank P177328 appraisal (2023), Windhoek Express (2024) and Windhoek Observer (2026)
+- **assumptions**: ZEN Namibia (2026). ZEN Namibia modelling assumptions. ZEN Namibia, data/raw_data/05-assumptions/zen_namibia_assumptions.csv.
+- **manual_nodes**: ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Namibian nodes group the administrative regions; coordinates of a main town
 
 opex_specific_variable
 ----------------------
@@ -37,9 +56,8 @@ distance
 --------
 
 Step 1
-Great-circle distance between the capital cities of the two nodes (informative only: no line losses or costs).
+Great-circle distance between the coordinates of the two nodes (informative only: no line losses or costs).
 
 **Citations**
 
-- **sapp_transfer_limits**: Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
-- **manual_nodes**: ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Coordinates of the capital cities
+- **manual_nodes**: ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Namibian nodes group the administrative regions; coordinates of a main town

@@ -13,7 +13,7 @@ from zen_namibia.datasets.datasets.technology.nampower_projects import (
     NamPowerProjectCosts,
 )
 from zen_namibia.datasets.datasets.technology.nirp import NIRP2022
-from zen_namibia.utils import new_technology_capacity_limit
+from zen_namibia.datasets.datasets.energy_system.manual_nodes import ManualNodes
 
 
 class EnginePowerPlant(ConversionTechnology):
@@ -46,7 +46,7 @@ class EnginePowerPlant(ConversionTechnology):
             self, "anixas", "hfo", description=", Anixas I used as a proxy for new engines")
 
     def _set_capacity_limit(self) -> Attribute:
-        return new_technology_capacity_limit(self)
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(self)
 
     def _set_capacity_lower_limit(self) -> Attribute:
         return NamPowerCommittedProjects(self.source_path).get_capacity_lower_limit(self)

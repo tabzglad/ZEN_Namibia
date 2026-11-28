@@ -12,11 +12,13 @@ from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
 )
 from zen_namibia.datasets.datasets.carrier.hyphen import HyphenHydrogen
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR
-from zen_namibia.utils import DOMESTIC_NODE, model_years
+from zen_namibia.datasets.datasets.energy_system.manual_nodes import ManualNodes
+from zen_namibia.utils import model_years
 
 
 class HydrogenDemand(DatasetCollection):
-    """Green hydrogen demand: Hyphen Phase 1 output, flat over the year, in MW (LHV)."""
+    """Green hydrogen demand: Hyphen Phase 1 output, flat over the year, in MW (LHV),
+    at the node of Hyphen's plant."""
 
     name = "hydrogen_demand"
 
@@ -27,6 +29,7 @@ class HydrogenDemand(DatasetCollection):
         return {
             "hyphen": HyphenHydrogen(self.source_path),
             "assumptions": ZENNamibiaAssumptions(self.source_path),
+            "manual_nodes": ManualNodes(self.source_path),
         }
 
     def first_year(self) -> int:
@@ -41,21 +44,22 @@ class HydrogenDemand(DatasetCollection):
         years = model_years(element)
         first_year = self.first_year()
         hyphen = self.data["hyphen"]
+        node = self.data["manual_nodes"].hydrogen_node()
         return element.demand.set_data(
             default_value=0.0,
             unit=element.power_unit,
             df=pd.DataFrame(
-                {DOMESTIC_NODE: np.full(STEPS_PER_YEAR, self.demand_mw())},
+                {node: np.full(STEPS_PER_YEAR, self.demand_mw())},
                 index=pd.RangeIndex(STEPS_PER_YEAR, name="time"),
             ),
             yearly_variations_df=pd.DataFrame(
-                {DOMESTIC_NODE: [1.0 if year >= first_year else 0.0 for year in years]},
+                {node: [1.0 if year >= first_year else 0.0 for year in years]},
                 index=pd.Index(years, name="year"),
             ),
             source=cite(
                 self,
                 f"Hyphen Phase 1 green hydrogen output ({hyphen.demand_tonnes():,.0f} t/yr) "
-                "times the lower heating value, flat over the year at the Namibian node, "
+                f"times the lower heating value, flat over the year at {node} (Hyphen's plant), "
                 f"from {first_year}.",
             ),
         )

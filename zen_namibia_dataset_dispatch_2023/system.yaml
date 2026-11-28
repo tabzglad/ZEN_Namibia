@@ -1,5 +1,8 @@
 set_nodes:
-- NAM
+- NAM_NORTH
+- NAM_CENTRAL
+- NAM_COAST
+- NAM_SOUTH
 - ZAF
 - ZMB
 - ZWE

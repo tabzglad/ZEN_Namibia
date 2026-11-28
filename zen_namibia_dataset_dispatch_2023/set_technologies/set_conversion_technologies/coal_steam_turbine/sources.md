@@ -11,21 +11,23 @@ capacity_existing
 -----------------
 
 Step 1
-Installed capacity in 2023 (van_eck_thermal_mw in capacities.csv), as one vintage built in 2023.
+Installed capacity in 2023 (van_eck_thermal_mw in capacities.csv, 120 MW) at NAM_CENTRAL, as one vintage built in 2023.
 
-**Citation**
+**Citations**
 
-NamPower (2025). NamPower annual reports and statistics 2019-2025. NamPower Integrated Annual Reports.. Note: compiled in the ZEN Namibia baseline workbook
+- **nampower_capacities**: NamPower (2025). NamPower annual reports and statistics 2019-2025. NamPower Integrated Annual Reports.. Note: compiled in the ZEN Namibia baseline workbook
+- **manual_plant_locations**: ZEN Namibia (2026). Location of NamPower's power stations. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/plant_locations.csv.
 
 capacity_limit
 --------------
 
 Step 1
-Capped at the installed capacity in the reference year in every year (not expandable); zero at the neighbouring nodes.
+Capped at the installed capacity in every year (not expandable); zero at all other nodes.
 
-**Citation**
+**Citations**
 
-NamPower (2025). NamPower annual reports and statistics 2019-2025. NamPower Integrated Annual Reports.. Note: compiled in the ZEN Namibia baseline workbook
+- **nampower_capacities**: NamPower (2025). NamPower annual reports and statistics 2019-2025. NamPower Integrated Annual Reports.. Note: compiled in the ZEN Namibia baseline workbook
+- **manual_plant_locations**: ZEN Namibia (2026). Location of NamPower's power stations. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/plant_locations.csv.
 
 max_load
 --------

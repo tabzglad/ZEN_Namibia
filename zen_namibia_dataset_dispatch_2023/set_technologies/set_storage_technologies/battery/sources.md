@@ -11,13 +11,13 @@ capacity_limit
 --------------
 
 Step 1
-Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in Namibia in later years; not allowed at the neighbouring nodes.
+Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in later years at every Namibian node; not allowed at the neighbouring nodes.
 
 capacity_lower_limit
 --------------------
 
 Step 1
-Committed projects online by each year: Omburu BESS (51 MW, 2026).
+Committed projects online by each year: Omburu BESS (51 MW at NAM_COAST, 2026).
 
 **Citation**
 
@@ -52,13 +52,13 @@ capacity_limit_energy
 ---------------------
 
 Step 1
-Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in Namibia in later years; not allowed at the neighbouring nodes.
+Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in later years at every Namibian node; not allowed at the neighbouring nodes.
 
 capacity_lower_limit_energy
 ---------------------------
 
 Step 1
-Committed projects online by each year: Omburu BESS (51 MW, 2026).
+Committed projects online by each year: Omburu BESS (51 MW at NAM_COAST, 2026).
 
 **Citation**
 
@@ -82,7 +82,7 @@ energy_to_power_ratio_min
 -------------------------
 
 Step 1
-Duration of the committed projects: Omburu BESS (51 MW, 2026).
+Duration of the committed projects: Omburu BESS (51 MW at NAM_COAST, 2026).
 
 **Citation**
 
@@ -92,7 +92,7 @@ energy_to_power_ratio_max
 -------------------------
 
 Step 1
-Duration of the committed projects: Omburu BESS (51 MW, 2026).
+Duration of the committed projects: Omburu BESS (51 MW at NAM_COAST, 2026).
 
 **Citation**
 

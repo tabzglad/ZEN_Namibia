@@ -15,13 +15,13 @@ capacity_limit
 --------------
 
 Step 1
-Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in Namibia in later years; not allowed at the neighbouring nodes.
+Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in later years at every Namibian node; not allowed at the neighbouring nodes.
 
 capacity_lower_limit
 --------------------
 
 Step 1
-Committed projects online by each year: Otjikoto Biomass Power Station (40 MW, 2027).
+Committed projects online by each year: Otjikoto Biomass Power Station (40 MW at NAM_NORTH, 2027).
 
 **Citation**
 

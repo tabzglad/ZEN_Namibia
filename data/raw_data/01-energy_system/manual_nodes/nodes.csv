@@ -1,5 +1,8 @@
-node,country,lon,lat,role,description
-NAM,Namibia,17.0658,-22.5609,domestic,"Namibia: all demand and plants; no imports or exports at this node. Coordinates of Windhoek"
-ZAF,South Africa,28.1881,-25.7461,sapp_market,"SAPP market and Eskom: imports at the SAPP price; the only node that exports. Coordinates of Pretoria"
-ZMB,Zambia,28.2833,-15.4167,contract,"ZESCO import contract. Coordinates of Lusaka"
-ZWE,Zimbabwe,31.0522,-17.8292,contract,"ZPC import contract; reaches Namibia through Zambia. Coordinates of Harare"
+node,country,regions,lon,lat,role,hydrogen,description
+NAM_NORTH,Namibia,"Kunene, Omusati, Oshana, Ohangwena, Oshikoto, Kavango East and West, Zambezi, Otjozondjupa",15.6960,-17.7883,domestic,no,"NORED and CENORED supply areas: Ruacana, Otjikoto; the Caprivi Link from Zambia lands at Gerus. Coordinates of Oshakati"
+NAM_CENTRAL,Namibia,"Khomas, Omaheke",17.0658,-22.5609,domestic,no,"Windhoek and Van Eck. Coordinates of Windhoek"
+NAM_COAST,Namibia,Erongo,14.5053,-22.9576,domestic,no,"Erongo RED area, uranium mines, Anixas, Omburu. Coordinates of Walvis Bay"
+NAM_SOUTH,Namibia,"Hardap, //Karas",18.1338,-26.5733,domestic,yes,"Mariental, Keetmanshoop, Luderitz, Rosh Pinah; the South African lines land at Kokerboom; Hyphen's hydrogen plant at Tsau Khaeb near Luderitz. Coordinates of Keetmanshoop (Kokerboom)"
+ZAF,South Africa,,28.1881,-25.7461,sapp_market,no,"SAPP market and Eskom: imports at the SAPP price; the only node that exports. Coordinates of Pretoria"
+ZMB,Zambia,,28.2833,-15.4167,contract,no,"ZESCO import contract. Coordinates of Lusaka"
+ZWE,Zimbabwe,,31.0522,-17.8292,contract,no,"ZPC import contract; reaches Namibia through Zambia. Coordinates of Harare"

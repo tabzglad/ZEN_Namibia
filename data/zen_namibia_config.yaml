@@ -3,8 +3,12 @@ source_path: "./data/raw_data"
 
 # all settings in the system.yaml file with the exception of technology lists
 system:
+  # Namibia in four regions (nodes.csv), plus the neighbours it trades with.
   set_nodes:
-    - NAM
+    - NAM_NORTH
+    - NAM_CENTRAL
+    - NAM_COAST
+    - NAM_SOUTH
     - ZAF
     - ZMB
     - ZWE
@@ -26,8 +30,8 @@ system:
   allow_investment: true
 
 # add technologies/carriers to the model (resolved to the custom classes in zen_namibia/elements/)
-# Imports and exports enter Namibia (NAM) only through the power_line
-# interconnectors from South Africa (ZAF) and Zambia (ZMB); Zimbabwe (ZWE)
+# Imports and exports enter Namibia only through the power_line
+# interconnectors from South Africa (ZAF, at NAM_SOUTH) and Zambia (ZMB, at NAM_NORTH); Zimbabwe (ZWE)
 # is connected to Zambia through the Kariba link.
 # Natural gas is omitted until the model has sourced 2023 capacity and fuel data.
 elements:

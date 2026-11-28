@@ -9,13 +9,18 @@ from zen_creator.datasets.datasets.metadata import SourceInformation
 
 from zen_namibia.datasets.datasets._item_table import read_item_table
 from zen_namibia.datasets.datasets.carrier.nampower import nampower_metadata
-from zen_namibia.utils import capacity_existing_df, capacity_limit_df
 
-# Installed-capacity column of capacities.csv for each existing plant.
+# Installed-capacity column of capacities.csv and plant key (plant_locations.csv)
+# of each existing NamPower plant, by element.
 PLANT_COLUMNS = {
     "coal_steam_turbine": "van_eck_thermal_mw",
     "anixas_i": "anixas_i_mw",
     "hydro_turbine": "ruacana_hydro_mw",
+}
+PLANTS = {
+    "coal_steam_turbine": "van_eck",
+    "anixas_i": "anixas_i",
+    "hydro_turbine": "ruacana",
 }
 
 
@@ -59,31 +64,6 @@ class NamPowerCapacities(Dataset[dict[str, pd.DataFrame]]):
 
     def performance(self, item: str) -> float:
         return float(self.data["performance"].loc[item, "value"])
-
-    def get_capacity_existing(self, element: Element) -> Attribute:
-        year = element.config.system.reference_year
-        column = PLANT_COLUMNS[element.name]
-        return element.capacity_existing.set_data(
-            default_value=0.0, unit=element.power_unit,
-            df=capacity_existing_df(self.plant_capacity(element), year),
-            source=SourceInformation(
-                description=f"Installed capacity in {year} ({column} in capacities.csv), "
-                            f"as one vintage built in {year}.",
-                metadata=self.metadata,
-            ),
-        )
-
-    def get_capacity_limit(self, element: Element) -> Attribute:
-        """No new capacity: capped at the existing plant in Namibia, zero elsewhere."""
-        return element.capacity_limit.set_data(
-            default_value=0.0, unit=element.power_unit,
-            df=capacity_limit_df(element, self.plant_capacity(element), expandable=False),
-            source=SourceInformation(
-                description="Capped at the installed capacity in the reference year in every "
-                            "year (not expandable); zero at the neighbouring nodes.",
-                metadata=self.metadata,
-            ),
-        )
 
     def get_max_load_van_eck(self, element: Element) -> Attribute:
         """Limit Van Eck to its available capacity reported for the reference year."""

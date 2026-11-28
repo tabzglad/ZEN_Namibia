@@ -3,8 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
-from zen_creator import Attribute, Dataset, Element, MetaData
-from zen_creator.datasets.datasets.metadata import SourceInformation
+from zen_creator import Dataset, MetaData
 
 LIMIT_COLUMNS = [
     "interconnector",
@@ -94,37 +93,3 @@ class SAPPTransferLimits(Dataset[pd.DataFrame]):
         """All nodes joined by an interconnector."""
         return sorted(set(self.data["node_from"]) | set(self.data["node_to"]))
 
-    def get_capacity_existing(self, element: Element) -> Attribute:
-        """Existing transfer capacity per directed edge, built in the reference year."""
-        reference_year = element.config.system.reference_year
-        capacities = self.edge_capacities()
-        df = pd.DataFrame(
-            {"capacity_existing": capacities.to_numpy()},
-            index=pd.MultiIndex.from_tuples(
-                [(edge, reference_year) for edge in capacities.index],
-                names=["edge", "year_construction"],
-            ),
-        )
-        return element.capacity_existing.set_data(
-            default_value=0.0, unit=element.power_unit, df=df,
-            source=SourceInformation(
-                description=(
-                    "SAPP applicable transfer limit per direction (model_limit_mw in "
-                    "interconnectors.csv; parallel lines summed; the listed direction is "
-                    "assumed for the reverse direction too)."
-                ),
-                metadata=self.metadata,
-            ),
-        )
-
-    def get_capacity_limit(self, element: Element) -> Attribute:
-        """No new line capacity: each edge is capped at its existing limit."""
-        capacities = self.edge_capacities()
-        return element.capacity_limit.set_data(
-            default_value=0.0, unit=element.power_unit,
-            df=pd.DataFrame({"capacity_limit": capacities.to_numpy()}, index=capacities.index),
-            source=SourceInformation(
-                description="Lines are not expandable: each edge is capped at its transfer limit.",
-                metadata=self.metadata,
-            ),
-        )

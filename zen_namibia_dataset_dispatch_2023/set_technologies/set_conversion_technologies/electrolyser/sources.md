@@ -11,7 +11,7 @@ capacity_limit
 --------------
 
 Step 1
-Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in Namibia in later years; not allowed at the neighbouring nodes.
+Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in later years only at NAM_SOUTH, the node of Hyphen's hydrogen plant; not allowed at the neighbouring nodes.
 
 opex_specific_fixed
 -------------------

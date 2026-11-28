@@ -1,0 +1,6 @@
+plant,node,location,description
+van_eck,NAM_CENTRAL,Windhoek,"Van Eck coal power station, Windhoek (Khomas)"
+anixas_i,NAM_COAST,Walvis Bay,"Anixas I HFO power station, Walvis Bay (Erongo)"
+ruacana,NAM_NORTH,Ruacana,"Ruacana hydro power station on the Kunene (Omusati)"
+omburu_pv,NAM_COAST,Omaruru,"NamPower Omburu PV plant at the Omburu substation near Omaruru (Erongo)"
+rosh_pinah_wind,NAM_SOUTH,Rosh Pinah,"Site of NamPower's cancelled 40 MW Rosh Pinah wind farm, whose P50 yield scales the wind profile (plant_performance.csv)"

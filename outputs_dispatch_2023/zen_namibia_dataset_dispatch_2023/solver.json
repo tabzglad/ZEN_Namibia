@@ -2,6 +2,8 @@
   "name": "gurobi",
   "solver_options": {
     "Threads": 1,
+    "Method": 2,
+    "Crossover": 0,
     "PreSparsify": 1,
     "NodefileStart": 0.5,
     "NodefileDir": "C:\\Users\\glady\\zen_namibia\\ZEN_Namibia\\gurobi_nodefiles"

@@ -10,12 +10,14 @@ from zen_namibia.datasets.dataset_collections._sources import cite
 from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
     ZENNamibiaAssumptions,
 )
+from zen_namibia.datasets.datasets.energy_system.manual_plant_locations import (
+    ManualPlantLocations,
+)
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.renewables_ninja import (
     STEPS_PER_YEAR,
     RenewablesNinja,
 )
-from zen_namibia.utils import DOMESTIC_NODE
 
 
 class HydroAvailability(DatasetCollection):
@@ -36,6 +38,7 @@ class HydroAvailability(DatasetCollection):
             "renewables_ninja": RenewablesNinja(self.source_path),
             "nampower_capacities": NamPowerCapacities(self.source_path),
             "assumptions": ZENNamibiaAssumptions(self.source_path),
+            "manual_plant_locations": ManualPlantLocations(self.source_path),
         }
 
     def monthly_max_load(self, reference_year: int) -> tuple[np.ndarray, pd.Series]:
@@ -82,7 +85,7 @@ class HydroAvailability(DatasetCollection):
     def get_max_load(self, element: Element) -> Attribute:
         monthly, months = self.monthly_max_load(element.config.system.reference_year)
         profile = pd.DataFrame(
-            {DOMESTIC_NODE: monthly[months.to_numpy() - 1]},
+            {self.data["manual_plant_locations"].node("ruacana"): monthly[months.to_numpy() - 1]},
             index=pd.RangeIndex(STEPS_PER_YEAR, name="time"),
         )
         target = self.data["nampower_capacities"].performance("ruacana_generation")

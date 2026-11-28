@@ -7,9 +7,10 @@ from .hydrogen_demand import HydrogenDemand
 from .hydrogen_technology_costs import HydrogenTechnologyCosts
 from .interconnectors import Interconnectors
 from .monetary_conversion import MonetaryConversion
+from .regional_demand_shares import RegionalDemandShares
 from .renewable_fleet import RenewableFleet
 from .technology_costs import TechnologyCosts
-from .thermal_availability import ThermalAvailability
+from .thermal_fleet import ThermalFleet
 
 __all__ = [
     "ElectricityDemand",
@@ -20,7 +21,8 @@ __all__ = [
     "HydrogenTechnologyCosts",
     "Interconnectors",
     "MonetaryConversion",
+    "RegionalDemandShares",
     "RenewableFleet",
     "TechnologyCosts",
-    "ThermalAvailability",
+    "ThermalFleet",
 ]

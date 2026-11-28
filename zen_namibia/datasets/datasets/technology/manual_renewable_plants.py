@@ -11,14 +11,15 @@ PLANT_COLUMNS = [
     "capacity_mw",
     "capacity_factor_2023_percent",
     "profile_file",
+    "node",
 ]
 
 
 class ManualRenewablePlants(Dataset[pd.DataFrame]):
     """Hand-compiled list of Namibia's 2023 wind and solar plants.
 
-    Each row gives a plant's installed capacity and the name of its
-    Renewables.ninja profile. The capacity factors are calculated from those
+    Each row gives a plant's installed capacity, its model node (from its
+    coordinates and administrative region) and the name of its Renewables.ninja profile. The capacity factors are calculated from those
     profiles.
     """
 

@@ -1,3 +1,5 @@
 node,year,capacity_limit
-NAM,2023,6.22
-NAM,2030,inf
+NAM_COAST,2023,0.22
+NAM_COAST,2030,inf
+NAM_SOUTH,2023,6.0
+NAM_SOUTH,2030,inf

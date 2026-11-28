@@ -1,0 +1,8 @@
+licensee,node,sales_gwh,note
+NORED,NAM_NORTH,401.6,"Northern Regional Electricity Distributor"
+OPE,NAM_NORTH,57.5,"Oshakati Premier Electric"
+CENORED,NAM_NORTH,155.3,"Central North Regional Electricity Distributor"
+Erongo RED,NAM_COAST,494.2,"Erongo Regional Electricity Distributor"
+Central Namibia local authorities,NAM_CENTRAL,865.1,"City of Windhoek, Okahandja and Omaheke local authorities"
+Southern Namibia local authorities,NAM_SOUTH,158.2,"Local authorities in Hardap and //Karas"
+NamPower Distribution,,190.8,"Commercial and large power users only (no domestic row); no region given, split between Central and South by assumption"

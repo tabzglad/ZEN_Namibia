@@ -14,7 +14,7 @@ from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
 from zen_namibia.datasets.datasets.technology.nampower_projects import (
     NamPowerCommittedProjects,
 )
-from zen_namibia.utils import new_technology_capacity_limit
+from zen_namibia.datasets.datasets.energy_system.manual_nodes import ManualNodes
 
 
 class Battery(StorageTechnology):
@@ -58,11 +58,11 @@ class Battery(StorageTechnology):
         return NamPowerCommittedProjects(self.source_path).get_energy_to_power_ratio(self, "max")
 
     def _set_capacity_limit(self) -> Attribute:
-        return new_technology_capacity_limit(self)
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(self)
 
     def _set_capacity_limit_energy(self) -> Attribute:
-        return new_technology_capacity_limit(
-            self, name="capacity_limit_energy", unit=f"{self.power_unit}*h")
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(
+            self, energy=True)
 
     def _set_capacity_lower_limit(self) -> Attribute:
         return NamPowerCommittedProjects(self.source_path).get_capacity_lower_limit(self)

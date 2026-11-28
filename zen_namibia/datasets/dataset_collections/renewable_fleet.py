@@ -7,6 +7,9 @@ import pandas as pd
 from zen_creator import Attribute, Dataset, DatasetCollection, Element
 
 from zen_namibia.datasets.dataset_collections._sources import cite
+from zen_namibia.datasets.datasets.energy_system.manual_plant_locations import (
+    ManualPlantLocations,
+)
 from zen_namibia.datasets.datasets.technology.manual_renewable_plants import (
     ManualRenewablePlants,
 )
@@ -18,24 +21,20 @@ from zen_namibia.datasets.datasets.technology.renewables_ninja import (
     STEPS_PER_YEAR,
     RenewablesNinja,
 )
-from zen_namibia.utils import (
-    DOMESTIC_NODE,
-    capacity_existing_df,
-    capacity_limit_df,
-    capacity_lower_limit_df,
-)
+from zen_namibia.utils import capacity_existing_df, capacity_limit_df, capacity_lower_limit_df
 
 # Technology in renewable_plants.csv of each element.
 TECHNOLOGY = {"photovoltaics": "solar", "onshore_wind_turbine": "wind"}
 
 
 class RenewableFleet(DatasetCollection):
-    """Wind and solar fleet: existing plants with capacity-weighted hourly
-    profiles, committed projects, and unlimited new capacity after 2023.
+    """Wind and solar per node: existing plants with capacity-weighted hourly
+    profiles, committed projects, and unlimited new capacity after 2023 at the
+    nodes that have a profile.
 
-    Combines the hand-compiled plant list, the Renewables.ninja profile of
-    each plant, the separate Omburu PV unit reported by NamPower (not in the
-    plant list), NamPower's wind yield, and the committed projects.
+    Combines the hand-compiled plant list (with each plant's node), the
+    Renewables.ninja profile of each plant, NamPower's separate Omburu PV unit
+    (not in the plant list), NamPower's wind yield, and the committed projects.
     """
 
     name = "renewable_fleet"
@@ -59,103 +58,119 @@ class RenewableFleet(DatasetCollection):
             "renewables_ninja": RenewablesNinja(self.source_path),
             "nampower_capacities": NamPowerCapacities(self.source_path),
             "nampower_committed_projects": NamPowerCommittedProjects(self.source_path),
+            "manual_plant_locations": ManualPlantLocations(self.source_path),
         }
 
-    def _omburu(self, year: int) -> pd.Series:
-        """Return NamPower's capacity row with the Omburu PV unit for a year."""
-        return self.data["nampower_capacities"].capacities_in(year)
-
-    def existing_capacity_mw(self, technology: str, year: int) -> float:
-        """Return the existing wind or solar fleet capacity in a year."""
-        capacity = self.data["manual_renewable_plants"].capacity_mw(technology)
+    def _plants(self, technology: str, year: int) -> pd.DataFrame:
+        """Plants of a technology with node, capacity and profile file, including
+        NamPower's Omburu PV unit for solar."""
+        plants = self.data["manual_renewable_plants"].plants(technology)[
+            ["plant", "node", "capacity_mw", "profile_file"]].copy()
         if technology == "solar":
-            capacity += float(self._omburu(year)["omburu_pv_mw"])
-        return capacity
+            omburu = self.data["nampower_capacities"].capacities_in(year)
+            if float(omburu["omburu_pv_mw"]) > 0:
+                plants.loc[len(plants)] = [
+                    "Omburu PV (NamPower)", self.data["manual_plant_locations"].node("omburu_pv"),
+                    float(omburu["omburu_pv_mw"]), omburu["omburu_pv_profile_file"]]
+        plants["capacity_mw"] = plants["capacity_mw"].astype(float)
+        return plants
 
-    def _existing(self, element: Element) -> tuple[str, float]:
+    def existing_by_node(self, technology: str, year: int) -> dict[str, float]:
+        """Existing capacity per node in a year."""
+        return self._plants(technology, year).groupby("node", sort=False)["capacity_mw"].sum().to_dict()
+
+    def _existing(self, element: Element) -> tuple[str, dict[str, float]]:
         technology = TECHNOLOGY[element.name]
-        return technology, self.existing_capacity_mw(
-            technology, element.config.system.reference_year)
+        return technology, self.existing_by_node(technology, element.config.system.reference_year)
+
+    def profiles(self, element: Element) -> pd.DataFrame:
+        """Hourly capacity factor per node: the capacity-weighted mean of the
+        node's plant profiles. Wind at the node of NamPower's Rosh Pinah wind
+        farm is scaled to its P50 yield (capped at 1), because the
+        Renewables.ninja Ombepo profile gives about 51%."""
+        technology = TECHNOLOGY[element.name]
+        ninja = self.data["renewables_ninja"]
+        plants = self._plants(technology, element.config.system.reference_year)
+        if plants.empty or (plants["capacity_mw"] <= 0).any():
+            raise ValueError(f"{technology} plants must be listed with positive capacities")
+        columns = {}
+        for node, rows in plants.groupby("node", sort=False):
+            weighted = sum(row.capacity_mw * ninja.capacity_factor(row.profile_file)
+                           for row in rows.itertuples()) / rows["capacity_mw"].sum()
+            columns[node] = weighted
+        if technology == "wind":
+            node = self.data["manual_plant_locations"].node("rosh_pinah_wind")
+            target = self.data["nampower_capacities"].performance("wind_capacity_factor")
+            columns[node] = (columns[node] * target / float(columns[node].mean())).clip(upper=1.0)
+        profiles = pd.DataFrame({n: p.to_numpy() for n, p in columns.items()},
+                                index=pd.RangeIndex(STEPS_PER_YEAR, name="time"))
+        if len(profiles) != STEPS_PER_YEAR:
+            raise ValueError(f"{technology} profiles must contain 8,760 hourly values")
+        return profiles
+
+    def expandable_nodes(self, element: Element) -> list[str]:
+        """New capacity only where an existing plant gives an hourly profile."""
+        return list(self._existing(element)[1])
 
     def get_capacity_existing(self, element: Element) -> Attribute:
         """The listed renewable portfolio as existing capacity in the reference year."""
-        technology, capacity = self._existing(element)
+        technology, existing = self._existing(element)
         year = element.config.system.reference_year
         return element.capacity_existing.set_data(
             default_value=0.0, unit=element.power_unit,
-            df=capacity_existing_df(capacity, year),
-            source=cite(self, f"Existing {year} {technology} fleet: renewable_plants.csv"
-                              + (" plus the Omburu PV unit in NamPower's capacities.csv."
+            df=capacity_existing_df(existing, year),
+            source=cite(self, f"Existing {year} {technology} fleet per node: plants in "
+                              "renewable_plants.csv at their node"
+                              + (", plus NamPower's Omburu PV unit (capacities.csv)."
                                  if technology == "solar" else "."),
-                        "manual_renewable_plants", "nampower_capacities"),
+                        "manual_renewable_plants", "nampower_capacities", "manual_plant_locations"),
         )
 
     def get_capacity_limit(self, element: Element) -> Attribute:
-        """The existing fleet in the reference year; unlimited in Namibia later."""
-        technology, capacity = self._existing(element)
+        """The existing fleet in the reference year; unlimited later at the
+        nodes with a profile."""
+        technology, existing = self._existing(element)
+        nodes = self.expandable_nodes(element)
         return element.capacity_limit.set_data(
             default_value=0.0, unit=element.power_unit,
-            df=capacity_limit_df(element, capacity, expandable=True),
-            source=cite(self, f"Existing {technology} fleet in the reference year (calibrated "
-                              "2023 run); unlimited in Namibia in later years (assumption); "
-                              "zero at the neighbouring nodes.",
-                        "manual_renewable_plants", "nampower_capacities"),
+            df=capacity_limit_df(element, existing, expandable_nodes=nodes),
+            source=cite(self, f"Existing {technology} fleet per node in the reference year "
+                              "(calibrated 2023 run); unlimited in later years (assumption) at "
+                              f"the nodes with an existing plant, and so an hourly profile: "
+                              f"{', '.join(nodes)}; zero elsewhere.",
+                        "manual_renewable_plants", "nampower_capacities", "manual_plant_locations"),
         )
 
     def get_capacity_lower_limit(self, element: Element) -> Attribute:
         """The existing fleet plus committed projects online by each later year."""
-        _, capacity = self._existing(element)
+        _, existing = self._existing(element)
         projects = self.data["nampower_committed_projects"]
+        outside = set(projects.nodes(element.name)).difference(self.expandable_nodes(element))
+        if outside:
+            raise ValueError(f"Committed {element.name} projects at nodes without a profile: {outside}")
         return element.capacity_lower_limit.set_data(
             default_value=0.0, unit=element.power_unit,
             df=capacity_lower_limit_df(
-                element, capacity, lambda year: projects.committed_by(element.name, year)),
-            source=cite(self, "Existing fleet plus committed projects online by each year: "
-                              f"{projects.describe(element.name)}."),
+                element, existing,
+                lambda node, year: projects.committed_by(element.name, year, node=node),
+                projects.nodes(element.name)),
+            source=cite(self, "Existing fleet per node plus committed projects online by each "
+                              f"year: {projects.describe(element.name)}."),
         )
 
     def get_max_load(self, element: Element) -> Attribute:
-        """Capacity-weighted hourly plant profiles. Wind is scaled to NamPower's
-        P50 yield for the Rosh Pinah wind farm (capped at 1), because the
-        Renewables.ninja Ombepo profile gives about 51%."""
         technology = TECHNOLOGY[element.name]
-        ninja = self.data["renewables_ninja"]
-        rows = self.data["manual_renewable_plants"].plants(technology)
-        if rows.empty:
-            raise ValueError(f"No 2023 plants are listed for technology {technology}")
-
-        plant_capacities = rows["capacity_mw"].astype(float).tolist()
-        plant_profiles = [ninja.capacity_factor(filename) for filename in rows["profile_file"]]
-
-        # Omburu PV's separate 20 MW unit is stored in NamPower's capacities.csv.
-        if technology == "solar":
-            omburu = self._omburu(element.config.system.reference_year)
-            if float(omburu["omburu_pv_mw"]) > 0:
-                plant_capacities.append(float(omburu["omburu_pv_mw"]))
-                plant_profiles.append(ninja.capacity_factor(omburu["omburu_pv_profile_file"]))
-
-        total_capacity = sum(plant_capacities)
-        if total_capacity <= 0:
-            raise ValueError(f"Installed capacity for {technology} must be positive")
-        weighted_profile = sum(
-            capacity * profile
-            for capacity, profile in zip(plant_capacities, plant_profiles, strict=True)
-        ) / total_capacity
-        description = (f"Hourly 2023 Renewables.ninja power profiles of the {technology} plants, "
-                       "normalized by each profile's simulated capacity and weighted by "
-                       "installed capacity")
+        profiles = self.profiles(element)
+        description = (f"Hourly 2023 Renewables.ninja power profiles of the {technology} plants "
+                       "at each node, normalized by each profile's simulated capacity and "
+                       "weighted by installed capacity")
         if technology == "wind":
+            node = self.data["manual_plant_locations"].node("rosh_pinah_wind")
             target = self.data["nampower_capacities"].performance("wind_capacity_factor")
-            weighted_profile = (
-                weighted_profile * target / float(weighted_profile.mean())).clip(upper=1.0)
-            description += (f", scaled to a {target:.1%} annual capacity factor (NamPower P50 "
-                            "yield of the Rosh Pinah wind farm)")
-        if len(weighted_profile) != STEPS_PER_YEAR:
-            raise ValueError(f"{technology} profile must contain 8,760 hourly values")
+            description += (f"; at {node} scaled to a {target:.1%} annual capacity factor "
+                            "(NamPower P50 yield of the Rosh Pinah wind farm)")
         return element.max_load.set_data(
-            default_value=float(weighted_profile.mean()), unit="1",
-            df=pd.DataFrame({DOMESTIC_NODE: weighted_profile.to_numpy()},
-                            index=pd.RangeIndex(STEPS_PER_YEAR, name="time")),
+            default_value=float(profiles.to_numpy().mean()), unit="1", df=profiles,
             source=cite(self, description + ".", "manual_renewable_plants", "renewables_ninja",
-                        "nampower_capacities"),
+                        "nampower_capacities", "manual_plant_locations"),
         )

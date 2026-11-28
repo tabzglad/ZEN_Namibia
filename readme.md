@@ -1,10 +1,12 @@
 # ZEN Namibia
 
 ZEN-garden model of the Namibian electricity system, built with zen-creator.
-The current setup is a fixed-fleet 2023 dispatch snapshot (8,760 hours, no
-investment) with four nodes: Namibia (`NAM`) and its neighbours South Africa
-(`ZAF`), Zambia (`ZMB`) and Zimbabwe (`ZWE`), joined by cross-border power
-lines. Zimbabwe connects to Namibia only through Zambia.
+The current setup optimizes 2023 (the calibrated fleet) and 2030 (investment
+allowed, green hydrogen for Hyphen Phase 1) on 2,000 representative hours.
+Namibia has four nodes (North, Central, Coast, South) joined by NamPower's
+transmission corridors, plus its neighbours South Africa (`ZAF`), Zambia
+(`ZMB`) and Zimbabwe (`ZWE`), joined by cross-border power lines. Zimbabwe
+connects to Namibia only through Zambia.
 
 ## Setup
 
@@ -79,6 +81,20 @@ listing where its values come from.
   and Ruacana O&M come from the NIRP (2020–2021 values); NIRP values are scaled to
   2023 prices with CPI. PV and wind fixed O&M come from IRENA (PV 2023 survey,
   wind Africa 2021) and are not CPI-scaled, because these costs have fallen.
+- Namibia has four nodes (`nodes.csv`): `NAM_NORTH` (Kunene to Zambezi and
+  Otjozondjupa; Ruacana, Otjikoto, the Caprivi Link from Zambia at Gerus),
+  `NAM_CENTRAL` (Khomas, Omaheke; Windhoek, Van Eck), `NAM_COAST` (Erongo;
+  Walvis Bay, Anixas, the uranium mines) and `NAM_SOUTH` (Hardap, //Karas;
+  the South African lines at Kokerboom, Luderitz and Hyphen). Demand is split
+  by each region's share of annual use (ECB 2022 distributor sales plus the
+  largest mines: North 30%, Central 32%, Coast 30%, South 8.5%), with the same
+  hourly shape everywhere. Plants sit at their node; new PV and wind can be
+  built at nodes with an existing plant (so an hourly profile), new engines,
+  biomass and batteries at any Namibian node, and electrolysers and hydrogen
+  storage only at `NAM_SOUTH`, where the hydrogen demand is. NamPower's
+  corridors between the nodes (`corridors.csv`) have circuits times an assumed
+  capacity per voltage (surge impedance loading); they are not expandable,
+  but lines commissioned after 2023 are added from their year.
 - Electricity is imported only at the `ZAF`, `ZMB` and `ZWE` nodes and
   exported only at `ZAF` (SAPP sales). It reaches Namibia through the
   `power_line` transport technology, limited per direction to 575 MW South

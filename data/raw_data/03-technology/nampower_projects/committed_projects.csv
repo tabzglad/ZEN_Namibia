@@ -1,8 +1,8 @@
-project,technology,capacity_mw,energy_mwh,expected_cod,stage,source
-Anixas II,engine_power_plant,54,,2024,commissioned after 2023,"NamPower IAR 2025; ECB register (Dec 2024)"
-Khan Solar PV,photovoltaics,20,,2025,commissioned after 2023,"NamPower IAR 2023 and 2025; ECB register (Dec 2024)"
-Otjikoto Solar (ISPS),photovoltaics,10,,2025,commissioned after 2023,"NamPower IAR 2025; ECB IAR 2025"
-Sores Gaib (Rosh Pinah) PV,photovoltaics,100,,2027,under construction,"NamPower IAR 2025; The Namibian (Oct 2026)"
-Omburu BESS,battery,51,51,2026,under construction,"NamPower IAR 2025; ECB IAR 2025"
-Otjikoto Biomass Power Station,biomass_power_plant,40,,2027,under construction,"NamPower IAR 2025; ECB register (Dec 2024)"
-Diaz Wind,onshore_wind_turbine,44,,2026,under construction,"NamPower IAR 2023-2025; The Namibian (Oct 2026)"
+project,technology,capacity_mw,energy_mwh,node,expected_cod,stage,source
+Anixas II,engine_power_plant,54,,NAM_COAST,2024,commissioned after 2023,NamPower IAR 2025; ECB register (Dec 2024)
+Khan Solar PV,photovoltaics,20,,NAM_COAST,2025,commissioned after 2023,NamPower IAR 2023 and 2025; ECB register (Dec 2024)
+Otjikoto Solar (ISPS),photovoltaics,10,,NAM_NORTH,2025,commissioned after 2023,NamPower IAR 2025; ECB IAR 2025
+Sores Gaib (Rosh Pinah) PV,photovoltaics,100,,NAM_SOUTH,2027,under construction,NamPower IAR 2025; The Namibian (Oct 2026)
+Omburu BESS,battery,51,51,NAM_COAST,2026,under construction,NamPower IAR 2025; ECB IAR 2025
+Otjikoto Biomass Power Station,biomass_power_plant,40,,NAM_NORTH,2027,under construction,NamPower IAR 2025; ECB register (Dec 2024)
+Diaz Wind,onshore_wind_turbine,44,,NAM_SOUTH,2026,under construction,NamPower IAR 2023-2025; The Namibian (Oct 2026)

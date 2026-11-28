@@ -11,11 +11,11 @@ from zen_namibia.datasets.dataset_collections.interconnectors import Interconnec
 from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
     ZENNamibiaAssumptions,
 )
-from zen_namibia.datasets.datasets.technology.sapp import SAPPTransferLimits
 
 
 class PowerLine(TransportTechnology):
-    """Cross-border power lines, one capacity per direction (SAPP transfer limits)."""
+    """Power lines, one capacity per direction: SAPP cross-border lines and NamPower's
+    corridors between the Namibian nodes."""
 
     name: str = "power_line"
 
@@ -35,10 +35,14 @@ class PowerLine(TransportTechnology):
     # ---------- Optional methods for overriding default attributes ----------
 
     def _set_capacity_existing(self) -> Attribute:
-        return SAPPTransferLimits(self.source_path).get_capacity_existing(self)
+        return Interconnectors(self.source_path).get_capacity_existing(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        return SAPPTransferLimits(self.source_path).get_capacity_limit(self)
+        return Interconnectors(self.source_path).get_capacity_limit(self)
+
+    def _set_capacity_lower_limit(self) -> Attribute:
+        """Lines commissioned after 2023 (Auas-Gerus, second Auas-Kokerboom) must be built."""
+        return Interconnectors(self.source_path).get_capacity_lower_limit(self)
 
     def _set_opex_specific_variable(self) -> Attribute:
         """Tiny wheeling cost so the solver does not route power in loops."""

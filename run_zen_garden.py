@@ -24,6 +24,10 @@ CONFIG = {
         # Slurm gives the job (euler/run.sbatch).
         "solver_options": {
             "Threads": int(os.environ.get("SLURM_CPUS_PER_TASK", 1)),
+            # Barrier without crossover: dual simplex stalled for hours on the
+            # degenerate multi-node LP (line flows with only a tie-breaker cost).
+            "Method": 2,
+            "Crossover": 0,
             "PreSparsify": 1,
             "NodefileStart": 0.5,
             "NodefileDir": str(NODEFILE_DIR),

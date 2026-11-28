@@ -16,7 +16,7 @@ from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
 from zen_namibia.datasets.datasets.technology.iea_future_of_hydrogen import (
     IEAFutureOfHydrogen2019,
 )
-from zen_namibia.utils import new_technology_capacity_limit
+from zen_namibia.datasets.datasets.energy_system.manual_nodes import ManualNodes
 
 
 class Electrolyser(ConversionTechnology):
@@ -48,7 +48,7 @@ class Electrolyser(ConversionTechnology):
         return IEAFutureOfHydrogen2019(self.source_path).get_conversion_factor(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        return new_technology_capacity_limit(self)
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(self, hydrogen_only=True)
 
     def _set_capex_specific_conversion(self) -> Attribute:
         return HydrogenTechnologyCosts(self.source_path).get_electrolyser_capex(self)

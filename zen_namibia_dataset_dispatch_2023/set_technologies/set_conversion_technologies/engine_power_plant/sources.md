@@ -15,13 +15,13 @@ capacity_limit
 --------------
 
 Step 1
-Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in Namibia in later years; not allowed at the neighbouring nodes.
+Assumption: not built in the reference year (the calibrated 2023 fleet); unlimited in later years at every Namibian node; not allowed at the neighbouring nodes.
 
 capacity_lower_limit
 --------------------
 
 Step 1
-Committed projects online by each year: Anixas II (54 MW, 2024).
+Committed projects online by each year: Anixas II (54 MW at NAM_COAST, 2024).
 
 **Citation**
 

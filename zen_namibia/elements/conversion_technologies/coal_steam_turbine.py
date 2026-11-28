@@ -8,11 +8,10 @@ if TYPE_CHECKING:
 from zen_creator import Attribute, ConversionTechnology
 
 from zen_namibia.datasets.dataset_collections.technology_costs import TechnologyCosts
-from zen_namibia.datasets.dataset_collections.thermal_availability import ThermalAvailability
+from zen_namibia.datasets.dataset_collections.thermal_fleet import ThermalFleet
 from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
     ZENNamibiaAssumptions,
 )
-from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.nirp import NIRP2022
 
 
@@ -48,14 +47,14 @@ class CoalSteamTurbine(ConversionTechnology):
     # ---------- Optional methods for overriding default attributes ----------
 
     def _set_capacity_existing(self) -> Attribute:
-        return NamPowerCapacities(self.source_path).get_capacity_existing(self)
+        return ThermalFleet(self.source_path).get_capacity_existing(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        return NamPowerCapacities(self.source_path).get_capacity_limit(self)
+        return ThermalFleet(self.source_path).get_capacity_limit(self)
 
     def _set_max_load(self) -> Attribute:
         """Limited to the 96 MW available capacity reported for 2023."""
-        return ThermalAvailability(self.source_path).get_max_load(self)
+        return ThermalFleet(self.source_path).get_max_load(self)
 
     def _set_opex_specific_variable(self) -> Attribute:
         return TechnologyCosts(self.source_path).get_opex_specific_variable(self)

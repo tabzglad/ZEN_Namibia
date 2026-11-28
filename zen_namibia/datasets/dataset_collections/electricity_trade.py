@@ -98,15 +98,16 @@ class ElectricityTrade(DatasetCollection):
         )
 
     def get_availability_import(self, element: Element) -> Attribute:
-        """No imports in Namibia itself; contract nodes capped at the contract
+        """No imports at the Namibian nodes; contract nodes capped at the contract
         size; South Africa limited only by the interconnector."""
-        domestic = self._nodes.domestic_node()
+        domestic = self._nodes.domestic_nodes()
         caps = self.data["nampower_import_contracts"].import_caps_mw().to_dict()
-        if domestic in caps:
-            raise ValueError("import_contracts.csv cannot cap imports at the domestic node")
+        if set(domestic) & set(caps):
+            raise ValueError("import_contracts.csv cannot cap imports at a Namibian node")
         return self._hourly(
-            element.availability_import, inf, element.power_unit, {domestic: 0.0, **caps},
-            cite(self, f"No imports at {domestic}; hourly imports at the contract nodes capped "
+            element.availability_import, inf, element.power_unit,
+            {**{node: 0.0 for node in domestic}, **caps},
+            cite(self, "No imports at the Namibian nodes; hourly imports at the contract nodes capped "
                        "at the contract size (ZESCO 180 MW, ZPC 80 MW); Eskom and SAPP market "
                        "imports at South Africa limited only by the interconnector.",
                  "nampower_import_contracts", "manual_nodes"),

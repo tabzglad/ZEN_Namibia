@@ -3,6 +3,7 @@ from .iea_global_hydrogen_review import IEAGlobalHydrogenReview2024
 from .irena_africa import IRENAAfricaPlanning2021
 from .irena_renewable_costs import IRENARenewableCosts2023
 from .manual_renewable_plants import ManualRenewablePlants
+from .manual_transmission import ManualTransmission
 from .nampower import NamPowerCapacities
 from .nampower_otjikoto import NamPowerOtjikoto
 from .nampower_projects import NamPowerCommittedProjects, NamPowerProjectCosts
@@ -18,6 +19,7 @@ __all__ = [
     "IRENAAfricaPlanning2021",
     "IRENARenewableCosts2023",
     "ManualRenewablePlants",
+    "ManualTransmission",
     "NamPowerCapacities",
     "NamPowerCommittedProjects",
     "NamPowerOtjikoto",

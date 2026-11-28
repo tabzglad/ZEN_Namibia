@@ -29,7 +29,7 @@ min_load:
   default_value: 0.0
   unit: '1'
 max_load:
-  default_value: 0.348
+  default_value: 0.21380644562058942
   unit: '1'
 opex_specific_variable:
   default_value: 0.0

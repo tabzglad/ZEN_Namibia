@@ -13,7 +13,7 @@ from zen_namibia.datasets.dataset_collections.hydrogen_technology_costs import (
 from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
     ZENNamibiaAssumptions,
 )
-from zen_namibia.utils import new_technology_capacity_limit
+from zen_namibia.datasets.datasets.energy_system.manual_nodes import ManualNodes
 
 
 class HydrogenStorage(StorageTechnology):
@@ -38,11 +38,11 @@ class HydrogenStorage(StorageTechnology):
             self, "efficiency_charge", "hydrogen_storage_charge_efficiency", unit="1")
 
     def _set_capacity_limit(self) -> Attribute:
-        return new_technology_capacity_limit(self)
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(self, hydrogen_only=True)
 
     def _set_capacity_limit_energy(self) -> Attribute:
-        return new_technology_capacity_limit(
-            self, name="capacity_limit_energy", unit=f"{self.power_unit}*h")
+        return ManualNodes(self.source_path).get_new_technology_capacity_limit(
+            self, hydrogen_only=True, energy=True)
 
     def _set_capex_specific_storage(self) -> Attribute:
         """Compressor cost per MW of charging power."""

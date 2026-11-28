@@ -40,15 +40,30 @@
   "set_transport_technologies_loss_exponential": [],
   "double_capex_transport": false,
   "set_nodes": [
-    "NAM",
+    "NAM_CENTRAL",
+    "NAM_COAST",
+    "NAM_NORTH",
+    "NAM_SOUTH",
     "ZAF",
     "ZMB",
     "ZWE"
   ],
   "coords": {
-    "NAM": {
+    "NAM_NORTH": {
+      "lon": 15.696,
+      "lat": -17.7883
+    },
+    "NAM_CENTRAL": {
       "lon": 17.0658,
       "lat": -22.5609
+    },
+    "NAM_COAST": {
+      "lon": 14.5053,
+      "lat": -22.9576
+    },
+    "NAM_SOUTH": {
+      "lon": 18.1338,
+      "lat": -26.5733
     },
     "ZAF": {
       "lon": 28.1881,

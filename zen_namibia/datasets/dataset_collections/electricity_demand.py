@@ -11,6 +11,7 @@ from zen_creator.utils.attribute import SourceInformation
 from zen_namibia.datasets.datasets.carrier.nampower import NamPowerDemand
 from zen_namibia.datasets.datasets.carrier.nirp import NIRPDemandGrowth
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR, PyPSA
+from zen_namibia.datasets.dataset_collections.regional_demand_shares import RegionalDemandShares
 from zen_namibia.utils import model_years
 
 
@@ -32,6 +33,7 @@ class ElectricityDemand(DatasetCollection):
             "nampower_demand": NamPowerDemand(self.source_path),
             "pypsa": PyPSA(self.source_path),
             "nirp_growth": NIRPDemandGrowth(self.source_path),
+            "regional_shares": RegionalDemandShares(self.source_path),
         }
 
     def energy_gwh(self, year: int) -> float:
@@ -52,12 +54,13 @@ class ElectricityDemand(DatasetCollection):
         """Demand in each optimized year relative to the reference year."""
         years = model_years(element)
         base = self.energy_gwh(element.config.system.reference_year)
+        factors = [self.energy_gwh(year) / base for year in years]
         return pd.DataFrame(
-            {"NAM": [self.energy_gwh(year) / base for year in years]},
+            {node: factors for node in self.data["regional_shares"].shares().index},
             index=pd.Index(years, name="year"),
         )
 
-    def _profile_for_year(self, year: int) -> pd.DataFrame:
+    def _profile_for_year(self, year: int) -> pd.Series:
         """Scale the PyPSA data to NamPower's data."""
         row = self.data["nampower_demand"].demand_in(year)
         average_demand_mw = float(row["demand_mw"])
@@ -66,10 +69,8 @@ class ElectricityDemand(DatasetCollection):
 
         pypsa = self.data["pypsa"]
         if year != pypsa.profile_year:
-            return pd.DataFrame(
-                {"NAM": np.full(STEPS_PER_YEAR, average_demand_mw)},
-                index=pd.RangeIndex(STEPS_PER_YEAR, name="time"),
-            )
+            return pd.Series(np.full(STEPS_PER_YEAR, average_demand_mw),
+                             index=pd.RangeIndex(STEPS_PER_YEAR, name="time"))
 
         demand = pypsa.data["demand_mw"].astype(float).copy()
         # Fill the two known zero rows by interpolating across the year boundary.
@@ -91,10 +92,16 @@ class ElectricityDemand(DatasetCollection):
                 f"Calibrating {year} demand to NamPower energy and peak produced "
                 "negative values"
             )
-        return pd.DataFrame(
-            {"NAM": demand.to_numpy()},
-            index=pd.RangeIndex(STEPS_PER_YEAR, name="time"),
-        )
+        return pd.Series(demand.to_numpy(), index=pd.RangeIndex(STEPS_PER_YEAR, name="time"))
+
+    def regional_profiles(self, year: int) -> pd.DataFrame:
+        """National hourly profile split over the Namibian nodes by their share
+        of annual demand (the same hourly shape at every node: no regional
+        load shapes are published)."""
+        national = self._profile_for_year(year)
+        shares = self.data["regional_shares"].shares()
+        return pd.DataFrame({node: national.to_numpy() * share for node, share in shares.items()},
+                            index=national.index)
 
     def get_demand(self, element: Element) -> Attribute:
         """Create the 8760-hour demand profile for the configured reference year."""
@@ -104,7 +111,7 @@ class ElectricityDemand(DatasetCollection):
         return element.demand.set_data(
             default_value=0.0,
             unit=element.power_unit,
-            df=self._profile_for_year(reference_year),
+            df=self.regional_profiles(reference_year),
             yearly_variations_df=self.yearly_variation(element),
             source=SourceInformation(
                 description=(
@@ -113,7 +120,10 @@ class ElectricityDemand(DatasetCollection):
                     f"annual energy and peak for {profile_year}, flat annual "
                     "average otherwise. Later optimized years scale the profile "
                     "with NamPower reported energy, then NIRP 2022 growth of "
-                    f"{rate:.1%} per year."
+                    f"{rate:.1%} per year. Split over the Namibian nodes by their share of "
+                    "annual use: distributor sales (ECB 2022) plus the largest mines ("
+                    + ", ".join(f"{n} {v:.1%}" for n, v in
+                                self.data["regional_shares"].shares().items()) + ")."
                 ),
                 metadata=self.metadata,
             ),

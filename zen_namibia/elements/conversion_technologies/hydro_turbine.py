@@ -9,10 +9,10 @@ from zen_creator import Attribute, ConversionTechnology
 
 from zen_namibia.datasets.dataset_collections.hydro_availability import HydroAvailability
 from zen_namibia.datasets.dataset_collections.technology_costs import TechnologyCosts
+from zen_namibia.datasets.dataset_collections.thermal_fleet import ThermalFleet
 from zen_namibia.datasets.datasets.assumptions.zen_namibia_assumptions import (
     ZENNamibiaAssumptions,
 )
-from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 
 
 class HydroTurbine(ConversionTechnology):
@@ -47,10 +47,10 @@ class HydroTurbine(ConversionTechnology):
     # ---------- Optional methods for overriding default attributes ----------
 
     def _set_capacity_existing(self) -> Attribute:
-        return NamPowerCapacities(self.source_path).get_capacity_existing(self)
+        return ThermalFleet(self.source_path).get_capacity_existing(self)
 
     def _set_capacity_limit(self) -> Attribute:
-        return NamPowerCapacities(self.source_path).get_capacity_limit(self)
+        return ThermalFleet(self.source_path).get_capacity_limit(self)
 
     def _set_max_load(self) -> Attribute:
         """Monthly availability from smoothed rainfall, scaled to Ruacana's generation."""

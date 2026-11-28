@@ -92,7 +92,7 @@ class NamPowerCommittedProjects(Dataset[pd.DataFrame]):
 
     def _set_data(self) -> pd.DataFrame:
         data = pd.read_csv(self.path)
-        required = {"project", "technology", "capacity_mw", "energy_mwh", "expected_cod"}
+        required = {"project", "technology", "capacity_mw", "energy_mwh", "node", "expected_cod"}
         missing = required.difference(data.columns)
         if missing:
             raise ValueError("committed_projects.csv is missing columns: " + ", ".join(sorted(missing)))
@@ -105,28 +105,39 @@ class NamPowerCommittedProjects(Dataset[pd.DataFrame]):
     def projects(self, technology: str) -> pd.DataFrame:
         return self.data.loc[self.data["technology"] == technology]
 
-    def committed_by(self, technology: str, year: int, column: str = "capacity_mw") -> float:
-        """Capacity (MW, or MWh for energy_mwh) of a technology online by a year."""
+    def committed_by(self, technology: str, year: int, column: str = "capacity_mw",
+                     node: str | None = None) -> float:
+        """Capacity (MW, or MWh for energy_mwh) of a technology online by a year,
+        at one node or in total."""
         rows = self.projects(technology)
-        return float(rows.loc[rows["expected_cod"] <= year, column].fillna(0.0).sum())
+        rows = rows.loc[rows["expected_cod"] <= year]
+        if node is not None:
+            rows = rows.loc[rows["node"] == node]
+        return float(rows[column].fillna(0.0).sum())
+
+    def nodes(self, technology: str) -> list[str]:
+        """Nodes with committed projects of a technology."""
+        return list(dict.fromkeys(self.projects(technology)["node"]))
 
     def describe(self, technology: str) -> str:
         rows = self.projects(technology)
         if rows.empty:
             return "no committed projects"
-        return ", ".join(f"{r.project} ({r.capacity_mw:g} MW, {r.expected_cod:.0f})"
+        return ", ".join(f"{r.project} ({r.capacity_mw:g} MW at {r.node}, {r.expected_cod:.0f})"
                          for r in rows.itertuples())
 
     def get_capacity_lower_limit(self, element: Element, energy: bool = False) -> Attribute:
         """Minimum capacity in later years: the committed projects online by then
-        (for technologies with no capacity in the reference year)."""
+        at their nodes (for technologies with no capacity in the reference year)."""
         name = "capacity_lower_limit_energy" if energy else "capacity_lower_limit"
         column = "energy_mwh" if energy else "capacity_mw"
         unit = f"{element.power_unit}*h" if energy else element.power_unit
         return getattr(element, name).set_data(
             default_value=0.0, unit=unit,
             df=capacity_lower_limit_df(
-                element, 0.0, lambda year: self.committed_by(element.name, year, column), name=name),
+                element, {},
+                lambda node, year: self.committed_by(element.name, year, column, node),
+                self.nodes(element.name), name=name),
             source=SourceInformation(
                 description=f"Committed projects online by each year: {self.describe(element.name)}.",
                 metadata=self.metadata,

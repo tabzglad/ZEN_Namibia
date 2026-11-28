@@ -40,18 +40,19 @@ set_nodes
 ---------
 
 Step 1
-Namibia and the neighbours it trades with, at their capital cities.
+Four Namibian regions (North, Central, Coast, South) and the neighbours Namibia trades with.
 
 **Citation**
 
-ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Coordinates of the capital cities
+ZEN Namibia (2026). ZEN Namibia nodes. ZEN Namibia, data/raw_data/01-energy_system/manual_nodes/nodes.csv.. Note: Namibian nodes group the administrative regions; coordinates of a main town
 
 set_edges
 ---------
 
 Step 1
-One directed edge per direction of each SAPP interconnector in the model.
+One directed edge per direction of each SAPP interconnector and each NamPower corridor between the Namibian nodes.
 
 **Citations**
 
 - **sapp_transfer_limits**: Southern African Power Pool (2023). SAPP interconnector transfer limits. SAPP Transfer Limits table (sapp.co.zw/transfer-limits). https://www.sapp.co.zw/transfer-limits. Note: Table is undated; applicable limit = lowest of thermal, voltage and stability limits
+- **manual_transmission**: ZEN Namibia (2026). NamPower transmission lines between the model's Namibian nodes. ZEN Namibia, data/raw_data/03-technology/manual_transmission/corridors.csv.. Note: Compiled from NamPower ECC renewal applications (MEFT EIA portal, 2020-2025), World Bank P177328 appraisal (2023), Windhoek Express (2024) and Windhoek Observer (2026)

@@ -1,0 +1,5 @@
+customer,node,electricity_gwh,year,basis,source
+Husab (Swakop Uranium),NAM_COAST,251,2023,reported,"Swakop Uranium Sustainability Report 2024, as quoted by Mining & Energy (26 Oct 2025), https://miningandenergy.com.na/swakop-uranium-achieves-record-processing-throughput/"
+Rossing Uranium,NAM_COAST,141,2023,derived,"Rossing 2023 Stakeholder Report, Key Environmental Metrics, p. 22: 1,208,298 GJ total energy x 42% from the grid / 3.6 GJ/MWh, https://rossing.com/files/2024/2023-stakeholder-report.pdf"
+Tsumeb smelter (Dundee Precious Metals),NAM_NORTH,157,2022,derived,"DPM Sustainability Report 2022, pp. 90-91: indirect energy intensity 15.16 GJ/t x 37,229 t blister / 3.6 GJ/MWh (read as electricity), https://www.dundeeprecious.com/site/assets/files/14816/2022-sustainability-report.pdf"
+B2Gold Otjikoto mine,NAM_NORTH,127,2024,estimated,"pv magazine (14 Aug 2024): about 14-15 MW drawn constantly from NamPower; 14.5 MW x 8,760 h"
